@@ -22,8 +22,8 @@ gruz_kb = InlineKeyboardMarkup(row_width=1).add(*(
 realty_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Аренда жилья', callback_data='rent'),
     InlineKeyboardButton(text='Покупка жилья', callback_data='buy'),
-    InlineKeyboardButton(text='Сдать жилье', callback_data='hand_over'),
-    InlineKeyboardButton(text='Прождать жилье', callback_data='sell_realty'),
+    InlineKeyboardButton(text='Сдать жилье', callback_data='give_rent'),
+    InlineKeyboardButton(text='Прождать жилье', callback_data='sell'),
     back_button
 ))
 
@@ -33,7 +33,6 @@ trans_vis_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Визаран', callback_data='visarun'),
     back_button
 ))
-
 
 exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ЕвроНал за безнал рубли', callback_data='eurorub'),
@@ -51,3 +50,7 @@ residence_docs_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
+
+realty_final_kb = ReplyKeyboardMarkup().add(
+    KeyboardButton(text='Завершить отправку файлов')
+)
