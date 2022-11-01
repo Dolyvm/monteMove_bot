@@ -1,14 +1,15 @@
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGroup, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGroup, ReplyKeyboardRemove, \
+    InlineKeyboardButton
 
 from functions import generate_order
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
-    realty_final_kb
+    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
-    realty_text_4
+    realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text
 
 
 class UserStates(StatesGroup):
@@ -21,6 +22,12 @@ class UserStates(StatesGroup):
     realty_state = State()
     final_state = State()
     realty_final_state = State()
+    vnj_state = State()
+    vnj_middle_state = State()
+    vnj_final_state = State()
+    get_documents_state = State()
+    master_state = State()
+    assistance_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -30,26 +37,44 @@ def register_user_handlers(dp: Dispatcher):
         await UserStates.start_state.set()
 
     @dp.callback_query_handler(state=UserStates.start_state)
-    async def start_options(callback: CallbackQuery):
+    async def start_options(callback: CallbackQuery, state: FSMContext):
         match callback.data:
             case 'exchange':
                 await callback.message.edit_text(option_text, reply_markup=exchange_kb)
                 await UserStates.exchange_state.set()
+                await state.update_data(option='Обмен Валют')
             case 'residence/docs':
                 await callback.message.edit_text(option_text, reply_markup=residence_docs_kb)
                 await UserStates.residence_state.set()
-            case 'rent_avt':
-                await callback.answer()
-                # await UserStates.rent_state.set()
+                await state.update_data(option='ВНЖ/Документы')
+            # case 'rent_avt':
+            #
+            #     await callback.answer()
+            #     # await UserStates.rent_state.set()
             case 'transfer':
                 await callback.message.edit_text(option_text, reply_markup=trans_vis_kb)
                 await UserStates.transfer_state.set()
+                await state.update_data(option='Трансферы/Визаран')
             case 'gruz':
                 await callback.message.edit_text(option_text, reply_markup=gruz_kb)
                 await UserStates.gruz_state.set()
+                await state.update_data(option='Грузоперевозки')
             case 'realty':
                 await callback.message.edit_text(option_text, reply_markup=realty_kb)
                 await UserStates.realty_state.set()
+            case 'masters':
+                await callback.message.edit_text(option_text, reply_markup=masters_kb)
+                await UserStates.master_state.set()
+            case 'byt':
+                await callback.message.edit_text(byt_text, reply_markup=url_kb)
+                await UserStates.master_state.set()
+            case 'assistance':
+                await callback.message.edit_text(
+                    text=zaglushka_text,
+                    reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back')))
+            case 'back':
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
 
     @dp.callback_query_handler(state=UserStates.exchange_state)
     async def exchange_options(callback: CallbackQuery):
@@ -62,13 +87,25 @@ def register_user_handlers(dp: Dispatcher):
                 await callback.message.edit_text(exchange_text)
                 await UserStates.final_state.set()
 
+    @dp.callback_query_handler(state=UserStates.master_state)
+    async def masters_options(callback: CallbackQuery):
+        match callback.data:
+            case 'back':
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
+                await UserStates.start_state.set()
+            case _:
+                await callback.message.edit_text(text=zaglushka_text,
+                                                 reply_markup=InlineKeyboardMarkup().add(
+                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
+
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery):
         match callback.data:
             case 'back':
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
-                await   UserStates.final_state.set()
+                await UserStates.start_state.set()
             case 'meet_port':
                 await callback.message.edit_text(trans_vis_text_1)
                 await UserStates.final_state.set()
@@ -82,12 +119,13 @@ def register_user_handlers(dp: Dispatcher):
                 await UserStates.final_state.set()
 
     @dp.callback_query_handler(state=UserStates.realty_state)
-    async def realty_options(callback: CallbackQuery):
+    async def realty_options(callback: CallbackQuery, state: FSMContext):
         match callback.data:
             case 'back':
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
-                await UserStates.final_state.set()
+                await UserStates.start_state.set()
+                return
             case 'rent':
                 await callback.message.edit_text(realty_text_1)
                 await UserStates.final_state.set()
@@ -104,19 +142,25 @@ def register_user_handlers(dp: Dispatcher):
             case 'sell':
                 await callback.message.answer(realty_text_4, reply_markup=realty_final_kb)
                 await UserStates.realty_final_state.set()
+        await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.residence_state)
-    async def residence_options(callback: CallbackQuery):
-        if callback.data == 'back':
-            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                             reply_markup=start_kb)
-            await UserStates.start_state.set()
-        else:
-            await callback.message.answer(text=residence_docs_text)
-            await UserStates.final_state.set()
+    async def residence_options(callback: CallbackQuery, state: FSMContext):
+        match callback.data:
+            case 'back':
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
+                await UserStates.start_state.set()
+            case 'get_residence':
+                await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
+                await UserStates.vnj_state.set()
+            case _:
+                await callback.message.answer(text=residence_docs_text)
+                await UserStates.final_state.set()
+                await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.gruz_state)
-    async def gruz_options(callback: CallbackQuery):
+    async def gruz_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == 'back':
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
@@ -124,14 +168,109 @@ def register_user_handlers(dp: Dispatcher):
         else:
             await callback.message.answer(text=gruz_text)
             await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
+
+    @dp.callback_query_handler(state=UserStates.vnj_state)
+    async def vnj_options(callback: CallbackQuery, state: FSMContext):
+        match callback.data:
+            case 'open_company':
+                await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
+                await UserStates.vnj_middle_state.set()
+
+            case 'realty_ownership':
+                await callback.answer()
+            case 'employer':
+                await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
+                await UserStates.vnj_middle_state.set()
+            case 'other':
+                await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
+                await UserStates.start_state.set()
+            case 'back':
+                await callback.message.edit_text(text=option_text, reply_markup=residence_docs_kb)
+                await UserStates.residence_state.set()
+                return
+        await state.update_data(option=buttons_name_dict[callback.data])
+
+    @dp.callback_query_handler(state=UserStates.vnj_middle_state)
+    async def vnj_middle(callback: CallbackQuery, state: FSMContext):
+        match callback.data:
+            case 'show_docs':
+                await callback.message.edit_text(
+                    text=vnj_docs_text,
+                    reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
+
+            case 'ask_questions':
+                await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
+                await UserStates.start_state.set()
+            case 'upload_docs':
+                await callback.message.answer(text='Прикрепите документы:', reply_markup=realty_final_kb)
+                await UserStates.get_documents_state.set()
+            case 'back':
+                await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
+                await UserStates.vnj_state.set()
+                return
+            case 'back2':
+                await callback.message.answer(text=vnj_text, reply_markup=open_company_kb)
+            case 'yes' | 'no':
+                await callback.message.answer(text=zaglushka_text)
+                await UserStates.start_state.set()
+                await callback.message.answer(start_text.format(callback.message.chat.full_name), reply_markup=start_kb)
+
+
+    @dp.message_handler(state=UserStates.get_documents_state, content_types=('photo', 'document', 'text'))
+    async def get_documents(message: Message, state: FSMContext):
+        if message.text == 'Завершить отправку файлов':
+            order = generate_order()
+            data = await state.get_data()
+            if not data.get('text', None):
+                await message.answer(text='Отправьте требуемый текст')
+                return
+            if not data.get('photos', None):
+                await message.answer(text='Добавьте требуемые документы')
+                return
+            media_photo = MediaGroup()
+            media_documents = MediaGroup()
+            for i in data['photos']:
+                media_photo.attach_photo(i)
+            for i in data['documents']:
+                media_documents.attach_document(i)
+            await message.bot.send_message(chat_id=-1001591695557,
+                                           text=exchange_order_text.format(
+                                               order, data['option'], "\n".join(data['text'])))
+            await message.bot.send_media_group(chat_id=-1001591695557, media=media_photo)
+            await message.bot.send_media_group(chat_id=-1001591695557, media=media_documents)
+            await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
+            await state.update_data(photos=[])
+            await state.update_data(documents=[])
+            await state.update_data(text=[])
+
+            await UserStates.start_state.set()
+            await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
+        elif message.text:
+            data = await state.get_data()
+            text: list = data.get('text', [])
+            text.append(message.text)
+            await state.update_data(text=text)
+        elif message.photo:
+            data = await state.get_data()
+            photos: list = data.get('photos', [])
+            photos.append(message.photo[-1].file_id)
+            await state.update_data(photos=photos)
+        elif message.document:
+            data = await state.get_data()
+            documents: list = data.get('documents', [])
+            documents.append(message.document.file_id)
+            await state.update_data(documents=documents)
 
     @dp.message_handler(state=UserStates.final_state, content_types=('photo', 'text'))
     async def get_exchange_final(message: Message, state: FSMContext):
         order = generate_order()
+        data = await state.get_data()
         await message.answer(text=final_text.format(order))
         await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
         await UserStates.start_state.set()
-        await message.bot.send_message(chat_id=-1001591695557, text=exchange_order_text.format(order, message.text))
+        await message.bot.send_message(chat_id=-1001591695557,
+                                       text=exchange_order_text.format(order, data['option'], message.text))
 
     @dp.message_handler(state=UserStates.realty_final_state, content_types=('photo', 'text'))
     async def get_realty_files(message: Message, state: FSMContext):
@@ -147,19 +286,22 @@ def register_user_handlers(dp: Dispatcher):
             media = MediaGroup()
             for i in data['photos']:
                 media.attach_photo(i)
-            await message.bot.send_message(chat_id=-1001591695557, text=exchange_order_text.format(order, data['text']))
+            await message.bot.send_message(chat_id=-1001591695557,
+                                           text=exchange_order_text.format(order, data['option'],
+                                                                           '\n'.join(data['text'])))
             await message.bot.send_media_group(chat_id=-1001591695557, media=media)
             await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
             await state.update_data(photos=[])
-            await state.update_data(text=None)
+            await state.update_data(text=[])
             await UserStates.start_state.set()
             await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
         elif message.text:
-            await state.update_data(text=message.text)
+            data = await state.get_data()
+            text: list = data.get('text', [])
+            text.append(message.text)
+            await state.update_data(text=text)
         elif message.photo:
             data = await state.get_data()
             photos: list = data.get('photos', [])
             photos.append(message.photo[-1].file_id)
             await state.update_data(photos=photos)
-        elif message.caption:
-            await state.update_data(text=message.text)
