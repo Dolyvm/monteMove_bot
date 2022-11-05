@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Обмен валют', callback_data='exchange'),
     InlineKeyboardButton(text='ВНЖ/Документы', callback_data='residence/docs'),
-    # InlineKeyboardButton(text='Аренда авто', callback_data='rent_avt'),
+    InlineKeyboardButton(text='Аренда авто', callback_data='auto'),
     InlineKeyboardButton(text='Трансферы/Визаран', callback_data='transfer'),
     InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
@@ -13,6 +13,12 @@ start_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 back_button = InlineKeyboardButton(text='Назад', callback_data='back')
+
+auto_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='Заказать Аренду Авто', callback_data='rent_auto'),
+    InlineKeyboardButton(text='Сдать своё Авто в аренду', callback_data='give_rent_auto'),
+    back_button
+))
 
 gruz_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Отправить груз в РФ', callback_data='gruz_rf'),
@@ -38,11 +44,12 @@ trans_vis_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='ЕвроНал за безнал рубли', callback_data='eurorub'),
-    InlineKeyboardButton(text='ЕвроНал за криптовалюту', callback_data='crypto'),
-    InlineKeyboardButton(text='ЕвроНал Мск - ЕвроНал ЧГ', callback_data='msk_chern'),
-    InlineKeyboardButton(text='ЕвроНал ЧГ за $/ € на РФ Банках', callback_data='rf_bank'),
-    InlineKeyboardButton(text='Оплата он-лайн серивсов / покупка авиабилетов', callback_data='online_avia'),
+    InlineKeyboardButton(text='Наличные € за Безналичные ₽', callback_data='eurorub'),
+    InlineKeyboardButton(text='Наличные € за Криптовалюту', callback_data='crypto'),
+    InlineKeyboardButton(text='Наличные €$₽ МСК - Наличные € Черногория', callback_data='msk_chern'),
+    InlineKeyboardButton(text='Наличные €$₽ Питер - Наличные € Черногория', callback_data='spb_chern'),
+    InlineKeyboardButton(text='Наличные € в Черногория за $€ на РФ Банках', callback_data='rf_bank'),
+    InlineKeyboardButton(text='Оплата онлайн сервисов / покупка авиабилетов', callback_data='online_avia'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
@@ -68,8 +75,8 @@ residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
 
 open_company_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Увидеть список документов', callback_data='show_docs'),
-    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
     InlineKeyboardButton(text='Прикрепить документы', callback_data='upload_docs'),
+    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
     back_button
 ))
 
@@ -92,3 +99,8 @@ url_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Ссылка на групу', url='https://t.me/MonteMoveChat '),
     back_button
 ))
+
+
+number_request = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+number_button = KeyboardButton('Оставить номер', request_contact=True)
+number_request.add(number_button)
