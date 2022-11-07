@@ -25,21 +25,6 @@ def update_table(*args):
         worksheet.update_cell(new_n, i, arg)
 
 
-def get_line(number: str, answer="line"):
-    number = number[1:] if number[0] == "+" else number
-    values = worksheet.col_values(3)
-    line = len(values) - values[::-1].index(number)
-    return line if answer == "line" else worksheet.cell(line, 4).value
-
-
-def checkPayment():
-    for i in range(1, len(worksheet.col_values(1)) + 1):
-        values = worksheet.row_values(i)
-        if (values[7], values[8]) == ("Оплачено.", "Не обработано."):
-            worksheet.update_cell(i, 9, "Обработано.")
-            yield values[9], values[3]
-
-
 def test():
     print(worksheet.col_values(1))
 
