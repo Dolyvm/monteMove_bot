@@ -365,6 +365,7 @@ def register_user_handlers(dp: Dispatcher):
             photos.append(message.photo[-1].file_id)
             await state.update_data(photos=photos)
 
+
     @dp.message_handler(content_types=['contact'], state=UserStates.get_main_number_state)
     async def getContactMain(number: Contact, state: FSMContext):
         data = await state.get_data()
@@ -377,8 +378,9 @@ def register_user_handlers(dp: Dispatcher):
             chat_id=number["from"]["id"],
             text=start_text.format(number["from"]["first_name"] + (number["from"]["last_name"] or '')),
             reply_markup=start_kb)
-        update_table(data["category"],
-                     data["option"],
-                     number["contact"]["phone_number"],
-                     data['text'] if type(data['text']) == str else "\n".join(data['text']),
-                     data["order"])
+
+        update_table(category=data["category"],
+                     option=data["option"],
+                     number=number["contact"]["phone_number"],
+                     text=data['text'] if type(data['text']) == str else "\n".join(data['text']),
+                     order=data["order"])
