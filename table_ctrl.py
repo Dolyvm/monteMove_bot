@@ -20,10 +20,6 @@ def generateOrder():
 
 
 def update_table(category, option, number, text, order, client_nickname="", ):
-    # new_n = len(worksheet.col_values("1")) + 1  # Порядковый номер нового заказа
-    # for i, arg in enumerate(args, start=1):
-    #     worksheet.update_cell(new_n, i, arg)
-    #     print('записано:', i, arg)
     new_n = len(worksheet.col_values("1")) + 1  # Порядковый номер нового заказа
     worksheet.update_cell(new_n, 1, datetime.now().strftime("%d.%m.%Y"))
     worksheet.update_cell(new_n, 2, category)
@@ -34,11 +30,6 @@ def update_table(category, option, number, text, order, client_nickname="", ):
     worksheet.update_cell(new_n, 9, order)
 
 
-"""update_table(data["category"],
-                     data["option"],
-                     number["contact"]["phone_number"],
-                     data['text'] if type(data['text']) == str else "\n".join(data['text']),
-                     data["order"])"""
 
 
 def test():
