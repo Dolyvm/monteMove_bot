@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "relocation-table",
+  "private_key_id": "f94bf923b82dd4959f495e7dd7df8149987d904a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDIdl1heroF8vDV\nmvCr9QbJZdtQ6Nr5ris2Lj6k+nlbsWAFg4fJhyv9/j7vqAUayEzVSdVJ2YSphUT7\n51e7uU3zZAZkB6cu5uvh0UNwRw+u+9JENhUAsObxNY9TV6wcIuR5NogHDSuTBRI/\nhougEVAn1OECvUxOU17iGDT9Uz2WCnSD5J9frapv6pf/dlYRyvZypKHQZIoI5N+n\nMXCDeTYbQIZB0D9GysdwbLSmmc8zi4mfYCYxbRpdAqUfmqHncJT+TXxi8gb7kGmk\nBkmX+nGJXEOrpLVVvp0AAetdL9FpE841mBHeAGxJ0r7D/5/mmO7TOTlwswC3tBUe\nVpEe0N53AgMBAAECggEAANzy7voCdgcYlAWG7BPx07PSu2jylGj0ZQHS9uPghOK2\nc/T1LzVxR4vXhTGh1VPaciqktpzZ+N7gL/4hfxHqV4DClEis0W4LbZ1N3zG3IWeS\nfVpcQcoBMeBV/c5eqSpZ9c75y/SkZOLR3ssmARTsquyRjBujifd1l59HZHXTdI4U\nrz17SxXH/CkXHCh/i5pRRaXwFXnEDJ8BhLqn2lt5dLtHW2fjZkx6IW7j11hf6Pym\n6HdBdDJRauf0ekMUIJ39m2lL8mPfPD/eK/peKabNc4L98X43qFgHRqN2OX0IKvji\n/7feKXlBeCdsK/gUk54rBDJpHpIkmYrCxPoaE3uoSQKBgQDl8w9YIaQSwkVJ8VUS\nj//QxfTsMvMgsRioZjuM2HV3gV1QdRnZUe9f3A2GCrnunPUsWdZW0N4hxoRgNrq0\nRWoPB/vF3jZ9VCsb6rZ2iV3bmt+C3V/+ku3SsKJ/DRsEOdvwVrwkw4NHwWrmmRPc\ntkuMTJ9m9hmRGCPQrb89A2QKSQKBgQDfLCCNCo7lmtPInO0QAO9mbIijPuveokto\noz2j2GIeSCwDbiJjXg98OcceEJCP95vAgqFSERPIJfTsjo0DiDZnqGG4AyhyaIyw\nmrs1LOKnfUgsLdbMVByW5eoOdL54M0BcVr0wFR6wB/l3pGq89d03QDPr5iy2ON3b\nvMRXW1OivwKBgQCUrldijcXv1ytEB0YRjYhD7mtR+hOYNMoTwJ6KkD9LuRqj9kNz\nb/YODlO0MuVL8rLYLXJYig7G2fwn1dtcynEsLOZPZ0HmQXDqSRYXiPRmFTql/Aug\nqFIb49f9vHSWg+7A9OQMBVqyH87GMX5VPI2Wtshuo3uehHRL7rvzcGjT+QKBgEWY\n51XU0xd7n0xS1ANHp2ETu9DdEIXPqyCot9Je6spyy3cOY58FeGLPSe9wTwT2vRXe\nJx0GwlqKq8UR95wAYKcW9dKC+ZwkSqvQtU0yAEUnZtiQOwphuMC+Vq3HbpbhtNKX\nIkzaaUWQVxYeqkLfketnFEoe8BaryVR7m+d6TazVAoGBAK+oQraGnsDy5Tvhn7yD\n7eAIDB7hLNLRiC//96dtx4p8UY5sqJrBWSXT88NMAGKsvJlYbb46ucTWwsypwwxG\nGKptkcyJam7vskb7cso6Nx3nzkZ4y4F7phGKccIhm74UCwPohhKZxESLyvB9yvJ9\njQ0NERGl+nfXglHa1DaZXbW2\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-move@relocation-table.iam.gserviceaccount.com",
+  "client_id": "117464798698223807376",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-move%40relocation-table.iam.gserviceaccount.com"
+}

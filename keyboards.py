@@ -9,7 +9,7 @@ start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
     InlineKeyboardButton(text='Проверенные мастера Черногории', callback_data='masters'),
     InlineKeyboardButton(text='Быт', callback_data='byt'),
-    InlineKeyboardButton(text='Юр. помощь', callback_data='assistance'),
+    InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Move'),
 ))
 
 back_button = InlineKeyboardButton(text='Назад', callback_data='back')
@@ -86,10 +86,16 @@ employer_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 
+beauty_masters_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='Бровист Херцег-Нови', callback_data='brovi'),
+    InlineKeyboardButton(text='Мастер по ресницам Херцег-Нови', callback_data='resnitsy'),
+    back_button
+))
+
 masters_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Бьюти сфера', callback_data='beauty'),
-    InlineKeyboardButton(text='Строительные работы', callback_data='stroitel'),
-    InlineKeyboardButton(text='Бытовые услуги', callback_data='byt_uslugi'),
+    InlineKeyboardButton(text='Работы по дому и стройка', callback_data='byt_uslugi'),
+    InlineKeyboardButton(text='Психология', callback_data='psycho'),
     InlineKeyboardButton(text='Фотографы', callback_data='photographer'),
     back_button
 ))

@@ -10,12 +10,14 @@ from aiogram.utils.exceptions import ValidationError
 
 from table_ctrl import generateOrder
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
-    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request
+    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request, \
+    beauty_masters_kb
 from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text
+    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text, brovi_text, \
+    resnitsy_text
 
 
 class UserStates(StatesGroup):
@@ -38,6 +40,7 @@ class UserStates(StatesGroup):
     get_documents_state = State()
     master_state = State()
     assistance_state = State()
+    beauty_masters_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -83,11 +86,6 @@ def register_user_handlers(dp: Dispatcher):
                 await callback.message.edit_text(byt_text, reply_markup=url_kb)
                 await UserStates.master_state.set()
                 await state.update_data(category='Быт')
-            case 'assistance':
-                await callback.message.edit_text(
-                    text=zaglushka_text,
-                    reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back')))
-                await state.update_data(category='Юр. помощь')
             case 'back':
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
@@ -99,6 +97,11 @@ def register_user_handlers(dp: Dispatcher):
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
                 await UserStates.start_state.set()
+            case 'other':
+                await state.update_data(option=buttons_name_dict[callback.data])
+                await callback.message.edit_text(other_text)
+                await UserStates.final_state.set()
+
             case _:
                 await state.update_data(option=buttons_name_dict[callback.data])
                 await callback.message.edit_text(exchange_text)
@@ -136,7 +139,7 @@ def register_user_handlers(dp: Dispatcher):
         await message.bot.send_message(chat_id=-1001591695557,
                                        text=exchange_order_text.format(order, 'тачка',
                                                                        data['text'] + '\n\n' + message.text))
-        await message.answer(text=number_text, reply_markup=number_request)
+        await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
         await UserStates.get_main_number_state.set()
 
     @dp.callback_query_handler(state=UserStates.master_state)
@@ -146,12 +149,30 @@ def register_user_handlers(dp: Dispatcher):
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
                 await UserStates.start_state.set()
-
+            case 'beauty':
+                await callback.message.edit_text(text='Список мастеров:', reply_markup=beauty_masters_kb)
+                await UserStates.beauty_masters_state.set()
             case _:
                 await callback.message.edit_text(text=zaglushka_text,
                                                  reply_markup=InlineKeyboardMarkup().add(
                                                      InlineKeyboardButton(text='Назад', callback_data='back')))
                 await state.update_data(option=buttons_name_dict[callback.data])
+
+    @dp.callback_query_handler(state=UserStates.beauty_masters_state)
+    async def beauty_masters(callback: CallbackQuery, state: FSMContext):
+        match callback.data:
+            case 'back':
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
+                await UserStates.start_state.set()
+            case 'brovi':
+                await callback.message.edit_text(text=brovi_text, reply_markup=InlineKeyboardMarkup().add(
+                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
+            case 'resnitsy':
+                await callback.message.edit_text(text=resnitsy_text, reply_markup=InlineKeyboardMarkup().add(
+                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
+
+
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery, state: FSMContext):
@@ -300,7 +321,7 @@ def register_user_handlers(dp: Dispatcher):
             await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
             await state.update_data(photos=[])
             await state.update_data(documents=[])
-            await message.answer(text=number_text, reply_markup=number_request)
+            await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
             await UserStates.get_main_number_state.set()
         elif message.text:
             data = await state.get_data()
@@ -328,7 +349,7 @@ def register_user_handlers(dp: Dispatcher):
         await message.bot.send_message(chat_id=-1001591695557,
                                        text=exchange_order_text.format(order, data['option'], message.text))
         await UserStates.get_main_number_state.set()
-        await message.answer(text=number_text, reply_markup=number_request)
+        await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
 
     @dp.message_handler(state=UserStates.realty_final_state, content_types=('photo', 'text'))
     async def get_realty_files(message: Message, state: FSMContext):
@@ -351,8 +372,9 @@ def register_user_handlers(dp: Dispatcher):
             await message.bot.send_media_group(chat_id=-1001591695557, media=media)
             await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
             await state.update_data(photos=[])
+            await state.update_data(text=[])
 
-            await message.answer(text=number_text, reply_markup=number_request)
+            await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
             await UserStates.get_main_number_state.set()
         elif message.text:
             data = await state.get_data()
@@ -365,7 +387,6 @@ def register_user_handlers(dp: Dispatcher):
             photos.append(message.photo[-1].file_id)
             await state.update_data(photos=photos)
 
-
     @dp.message_handler(content_types=['contact'], state=UserStates.get_main_number_state)
     async def getContactMain(number: Contact, state: FSMContext):
         data = await state.get_data()
@@ -373,6 +394,7 @@ def register_user_handlers(dp: Dispatcher):
                                       text="⏳",
                                       reply_markup=ReplyKeyboardRemove())
         await state.update_data(number=number["contact"]["phone_number"])
+        await state.update_data(text=[])
         await UserStates.start_state.set()
         await number.bot.send_message(
             chat_id=number["from"]["id"],

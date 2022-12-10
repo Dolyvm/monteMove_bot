@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 import gspread
 import random
@@ -28,8 +29,6 @@ def update_table(category, option, number, text, order, client_nickname="", ):
     worksheet.update_cell(new_n, 7, number)
     worksheet.update_cell(new_n, 8, text)
     worksheet.update_cell(new_n, 9, order)
-
-
 
 
 def test():
