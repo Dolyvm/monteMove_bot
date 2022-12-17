@@ -159,10 +159,15 @@ def register_user_handlers(dp: Dispatcher):
                                                  reply_markup=start_kb)
                 await UserStates.start_state.set()
             case _:
-                await callback.message.edit_text(text='Список мастеров:',
-                                                 reply_markup=kb_from_dict(masters[callback.data]))
-                await UserStates.show_master_state.set()
-                await state.update_data(master_sphere=callback.data)
+                kb = kb_from_dict(masters[callback.data])
+                if kb:
+                    await callback.message.edit_text(text='Список мастеров:',
+                                                     reply_markup=kb)
+                    await UserStates.show_master_state.set()
+                    await state.update_data(master_sphere=callback.data)
+                else:
+                    await callback.message.edit_text(text=zaglushka_text,
+                                                     reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.show_master_state)
     async def show_master(callback: CallbackQuery, state: FSMContext):
