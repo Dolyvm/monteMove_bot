@@ -17,7 +17,8 @@ from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text
+    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text, \
+    vremennie_trudnosti
 
 
 class UserStates(StatesGroup):
@@ -39,7 +40,6 @@ class UserStates(StatesGroup):
     vnj_final_state = State()
     get_documents_state = State()
     master_state = State()
-    master_test_state = State()
     assistance_state = State()
     beauty_masters_state = State()
     show_master_state = State()
@@ -81,14 +81,10 @@ def register_user_handlers(dp: Dispatcher):
                 await callback.message.edit_text(option_text, reply_markup=realty_kb)
                 await UserStates.realty_state.set()
                 await state.update_data(category='Недвижимость')
-            case 'masters':
-                await callback.message.edit_text(option_text, reply_markup=masters_kb)
-                await UserStates.master_state.set()
-                await state.update_data(category='Мастера')
 
-            case 'masters_test':
+            case 'masters':
                 await callback.message.edit_text(option_text, reply_markup=kb_from_dict(get_masters()))
-                await UserStates.master_test_state.set()
+                await UserStates.master_state.set()
                 await state.update_data(category='Мастера')
             case 'byt':
                 await callback.message.edit_text(byt_text, reply_markup=url_kb)
@@ -262,9 +258,9 @@ def register_user_handlers(dp: Dispatcher):
             case 'open_company':
                 await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
                 await UserStates.vnj_middle_state.set()
-
             case 'realty_ownership':
-                await callback.answer()
+                await callback.message.answer(text=vremennie_trudnosti)
+                await UserStates.final_state.set()
             case 'employer':
                 await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
                 await UserStates.vnj_middle_state.set()

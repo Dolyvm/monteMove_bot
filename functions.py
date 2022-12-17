@@ -19,7 +19,7 @@ def get_masters() -> dict:
 
 
 def kb_from_dict(d: dict) -> InlineKeyboardMarkup | None:
-    if d.keys:
+    if d.keys():
         return InlineKeyboardMarkup(row_width=1).add(*[InlineKeyboardButton(text=i, callback_data=i)
                                                        for i in d.keys()])
     else:
