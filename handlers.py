@@ -17,8 +17,7 @@ from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text, brovi_text, \
-    resnitsy_text
+    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text
 
 
 class UserStates(StatesGroup):
@@ -177,20 +176,6 @@ def register_user_handlers(dp: Dispatcher):
             case _:
                 await callback.message.edit_text(text=masters[data['master_sphere']][callback.data]["text"],
                                                  reply_markup=back_kb)
-
-    @dp.callback_query_handler(state=UserStates.beauty_masters_state)
-    async def beauty_masters(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case 'brovi':
-                await callback.message.edit_text(text=brovi_text, reply_markup=InlineKeyboardMarkup().add(
-                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
-            case 'resnitsy':
-                await callback.message.edit_text(text=resnitsy_text, reply_markup=InlineKeyboardMarkup().add(
-                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery, state: FSMContext):
