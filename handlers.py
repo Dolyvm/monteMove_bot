@@ -8,10 +8,11 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGro
     InlineKeyboardButton, Contact
 from aiogram.utils.exceptions import ValidationError
 
+from functions import get_masters, kb_from_dict
 from table_ctrl import generateOrder
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request, \
-    beauty_masters_kb
+    beauty_masters_kb, back_kb
 from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
@@ -39,8 +40,11 @@ class UserStates(StatesGroup):
     vnj_final_state = State()
     get_documents_state = State()
     master_state = State()
+    master_test_state = State()
     assistance_state = State()
     beauty_masters_state = State()
+    show_master_state = State()
+
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -81,6 +85,11 @@ def register_user_handlers(dp: Dispatcher):
             case 'masters':
                 await callback.message.edit_text(option_text, reply_markup=masters_kb)
                 await UserStates.master_state.set()
+                await state.update_data(category='Мастера')
+
+            case 'masters_test':
+                await callback.message.edit_text(option_text, reply_markup=kb_from_dict(get_masters()))
+                await UserStates.master_test_state.set()
                 await state.update_data(category='Мастера')
             case 'byt':
                 await callback.message.edit_text(byt_text, reply_markup=url_kb)
@@ -144,19 +153,30 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.master_state)
     async def masters_options(callback: CallbackQuery, state: FSMContext):
+        masters = get_masters()
         match callback.data:
             case 'back':
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
                 await UserStates.start_state.set()
-            case 'beauty':
-                await callback.message.edit_text(text='Список мастеров:', reply_markup=beauty_masters_kb)
-                await UserStates.beauty_masters_state.set()
             case _:
-                await callback.message.edit_text(text=zaglushka_text,
-                                                 reply_markup=InlineKeyboardMarkup().add(
-                                                     InlineKeyboardButton(text='Назад', callback_data='back')))
-                await state.update_data(option=buttons_name_dict[callback.data])
+                await callback.message.edit_text(text='Список мастеров:',
+                                                 reply_markup=kb_from_dict(masters[callback.data]))
+                await UserStates.show_master_state.set()
+                await state.update_data(master_sphere=callback.data)
+
+    @dp.callback_query_handler(state=UserStates.show_master_state)
+    async def show_master(callback: CallbackQuery, state: FSMContext):
+        masters = get_masters()
+        data = await state.get_data()
+        match callback.data:
+            case 'back':
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
+                await UserStates.start_state.set()
+            case _:
+                await callback.message.edit_text(text=masters[data['master_sphere']][callback.data]["text"],
+                                                 reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.beauty_masters_state)
     async def beauty_masters(callback: CallbackQuery, state: FSMContext):
@@ -171,8 +191,6 @@ def register_user_handlers(dp: Dispatcher):
             case 'resnitsy':
                 await callback.message.edit_text(text=resnitsy_text, reply_markup=InlineKeyboardMarkup().add(
                                                      InlineKeyboardButton(text='Назад', callback_data='back')))
-
-
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery, state: FSMContext):

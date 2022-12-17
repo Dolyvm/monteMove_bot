@@ -11,5 +11,5 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
 register_user_handlers(dp)
-
+print('start')
 executor.start_polling(dispatcher=dp, skip_updates=True)

@@ -8,11 +8,14 @@ start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
     InlineKeyboardButton(text='Проверенные мастера Черногории', callback_data='masters'),
+    InlineKeyboardButton(text='мастера Черногории тест', callback_data='masters_test'),
     InlineKeyboardButton(text='Быт', callback_data='byt'),
     InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Move'),
 ))
 
 back_button = InlineKeyboardButton(text='Назад', callback_data='back')
+back_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Назад', callback_data='back')]])
+
 
 auto_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Заказать Аренду Авто', callback_data='rent_auto'),
@@ -102,7 +105,7 @@ masters_kb = InlineKeyboardMarkup(row_width=1).add(*(
 
 
 url_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Ссылка на групу', url='https://t.me/MonteMoveChat '),
+    InlineKeyboardButton(text='Ссылка на группу', url='https://t.me/MonteMoveChat '),
     back_button
 ))
 
