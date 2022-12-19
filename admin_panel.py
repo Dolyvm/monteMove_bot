@@ -53,8 +53,10 @@ def register_admin_handlers(dp: Dispatcher):
                 await callback.message.edit_text(text="Введите название новой вкладки")
                 await AdminPanelStates.GET_NEW_TAB_NAME_STATE.set()
             case "add_master":
-                await callback.message.edit_text(text="Введите название мастера")
-                await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
+                await state.update_data(option="add_master")
+                await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
+                                                 reply_markup=kb_from_dict(get_masters()))
+                await AdminPanelStates.CHOOSE_TAB_STATE.set()
             case "edit_master":
                 await state.update_data(option="edit_master")
                 await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
@@ -95,6 +97,14 @@ def register_admin_handlers(dp: Dispatcher):
             # Перекидываем в начало
             await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
             await AdminPanelStates.AP_START_STATE.set()
+            return
+
+        if data['option'] == "add_master":
+            await callback.message.answer(text="Введите название мастера и информацию о нем в следующем виде:\n"
+                                      "Название мастера\n"
+                                      "Информация (на следующей строке)")
+            await state.update_data(current_tab=callback.data)
+            await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
             return
 
         kb = kb_from_dict(masters[callback.data])
