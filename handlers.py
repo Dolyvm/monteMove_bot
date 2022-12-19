@@ -45,7 +45,6 @@ class UserStates(StatesGroup):
     show_master_state = State()
 
 
-
 def register_user_handlers(dp: Dispatcher):
     @dp.message_handler(commands=['start', 'help'], state='*')
     async def start(message: Message, state: FSMContext):
@@ -175,7 +174,7 @@ def register_user_handlers(dp: Dispatcher):
                                                  reply_markup=start_kb)
                 await UserStates.start_state.set()
             case _:
-                await callback.message.edit_text(text=masters[data['master_sphere']][callback.data]["text"],
+                await callback.message.edit_text(text=masters[data['master_sphere']][callback.data],
                                                  reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.transfer_state)

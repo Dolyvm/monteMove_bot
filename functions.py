@@ -24,3 +24,8 @@ def kb_from_dict(d: dict) -> InlineKeyboardMarkup | None:
                                                        for i in d.keys()])
     else:
         return
+
+
+def update_masters(new_dict) -> None:
+    with open('masters.json', 'w', encoding='utf-8') as d:
+        json.dump(new_dict, d, ensure_ascii=False)
