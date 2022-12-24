@@ -46,12 +46,12 @@ trans_vis_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Наличные € за Безналичные ₽', callback_data='eurorub'),
-    InlineKeyboardButton(text='Наличные € за Криптовалюту', callback_data='crypto'),
-    InlineKeyboardButton(text='Наличные €$₽ МСК - Наличные € Черногория', callback_data='msk_chern'),
-    InlineKeyboardButton(text='Наличные €$₽ Питер - Наличные € Черногория', callback_data='spb_chern'),
-    InlineKeyboardButton(text='Наличные € в Черногория за $€ на РФ Банках', callback_data='rf_bank'),
-    InlineKeyboardButton(text='Оплата онлайн сервисов / покупка авиабилетов', callback_data='online_avia'),
+    InlineKeyboardButton(text='Нал € за Безнал ₽', callback_data='eurorub'),
+    InlineKeyboardButton(text='Нал € за Криптовалюту', callback_data='crypto'),
+    InlineKeyboardButton(text='Нал €$₽ МСК - Наличные € чрнг', callback_data='msk_chern'),
+    InlineKeyboardButton(text='Нал €$₽ СПБ - Наличные € ЧРНГ', callback_data='spb_chern'),
+    InlineKeyboardButton(text='Нал € в ЧРНГ за $€ на РФ Банках', callback_data='rf_bank'),
+    InlineKeyboardButton(text='Онлайн сервисы / авиабилеты', callback_data='online_avia'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
@@ -68,9 +68,9 @@ realty_final_kb = ReplyKeyboardMarkup().add(
 )
 
 residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Получение ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
-    InlineKeyboardButton(text='Получение ВНЖ на основании открытия фирмы', callback_data='open_company'),
-    InlineKeyboardButton(text='Получение ВНЖ на основе трудоустройства на фирму', callback_data='employer'),
+    InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
+    InlineKeyboardButton(text='ВНЖ на основании открытия фирмы', callback_data='open_company'),
+    InlineKeyboardButton(text='ВНЖ на основе трудоустройства на фирму', callback_data='employer'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
