@@ -114,7 +114,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=rent_auto_first_text)
             await UserStates.rent_auto_text_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
-       elif callback.data == 'give_rent_auto':
+        elif callback.data == 'give_rent_auto':
             await callback.message.edit_text(text=rent_auto_third_text)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
