@@ -54,78 +54,75 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.start_state)
     async def start_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'exchange':
-                await callback.message.edit_text(option_text, reply_markup=exchange_kb)
-                await UserStates.exchange_state.set()
-                await state.update_data(category='Обмен Валют')
-            case 'residence/docs':
+        if callback.data == 'exchange':
+            await callback.message.edit_text(option_text, reply_markup=exchange_kb)
+            await UserStates.exchange_state.set()
+            await state.update_data(category='Обмен Валют')
+        elif callback.data == 'residence/docs':
                 await callback.message.edit_text(option_text, reply_markup=residence_docs_kb)
                 await UserStates.residence_state.set()
                 await state.update_data(category='ВНЖ/Документы')
-            case 'auto':
+        elif callback.data == 'auto':
                 await callback.message.edit_text(text='Аренда авто', reply_markup=auto_kb)
                 await UserStates.auto_state.set()
                 await state.update_data(category='Авто')
 
-            case 'transfer':
+        elif callback.data == 'transfer':
                 await callback.message.edit_text(option_text, reply_markup=trans_vis_kb)
                 await UserStates.transfer_state.set()
                 await state.update_data(category='Трансферы/Визаран')
-            case 'gruz':
+        elif callback.data == 'gruz':
                 await callback.message.edit_text(option_text, reply_markup=gruz_kb)
                 await UserStates.gruz_state.set()
                 await state.update_data(category='Грузоперевозки')
-            case 'realty':
+        elif callback.data == 'realty':
                 await callback.message.edit_text(option_text, reply_markup=realty_kb)
                 await UserStates.realty_state.set()
                 await state.update_data(category='Недвижимость')
 
-            case 'masters':
+        elif callback.data == 'masters':
                 await callback.message.edit_text(option_text, reply_markup=kb_from_dict(get_masters()))
                 await UserStates.master_state.set()
                 await state.update_data(category='Мастера')
-            case 'byt':
+        elif callback.data == 'byt':
                 await callback.message.edit_text(byt_text, reply_markup=url_kb)
                 await UserStates.master_state.set()
                 await state.update_data(category='Быт')
-            case 'back':
+        elif callback.data == 'back':
                 await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
 
     @dp.callback_query_handler(state=UserStates.exchange_state)
     async def exchange_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                                  reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case 'other':
-                await state.update_data(option=buttons_name_dict[callback.data])
-                await callback.message.edit_text(other_text)
-                await UserStates.final_state.set()
+            await UserStates.start_state.set()
+        elif callback.data == 'other':
+            await state.update_data(option=buttons_name_dict[callback.data])
+            await callback.message.edit_text(other_text)
+            await UserStates.final_state.set()
 
-            case _:
-                await state.update_data(option=buttons_name_dict[callback.data])
-                await callback.message.edit_text(exchange_text)
-                await UserStates.final_state.set()
+        else:
+            await state.update_data(option=buttons_name_dict[callback.data])
+            await callback.message.edit_text(exchange_text)
+            await UserStates.final_state.set()
 
     @dp.callback_query_handler(state=UserStates.auto_state)
     async def auto_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'rent_auto':
-                await callback.message.edit_text(text=rent_auto_first_text)
-                await UserStates.rent_auto_text_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
-            case 'give_rent_auto':
-                await callback.message.edit_text(text=rent_auto_third_text)
-                await UserStates.final_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
+        if callback.data == 'rent_auto':
+            await callback.message.edit_text(text=rent_auto_first_text)
+            await UserStates.rent_auto_text_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
+       elif callback.data == 'give_rent_auto':
+            await callback.message.edit_text(text=rent_auto_third_text)
+            await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
 
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
+        elif callback.data == 'back':
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
 
     @dp.message_handler(state=UserStates.rent_auto_text_state, content_types=['text'])
     async def rent_first_text(message: Message, state: FSMContext):
@@ -148,97 +145,92 @@ def register_user_handlers(dp: Dispatcher):
     @dp.callback_query_handler(state=UserStates.master_state)
     async def masters_options(callback: CallbackQuery, state: FSMContext):
         masters = get_masters()
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case _:
-                kb = kb_from_dict(masters[callback.data])
-                if kb:
-                    await callback.message.edit_text(text='Список мастеров:',
-                                                     reply_markup=kb)
-                    await UserStates.show_master_state.set()
-                    await state.update_data(master_sphere=callback.data)
-                else:
-                    await callback.message.edit_text(text=zaglushka_text,
-                                                     reply_markup=back_kb)
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+        else:
+            kb = kb_from_dict(masters[callback.data])
+            if kb:
+                await callback.message.edit_text(text='Список мастеров:',
+                                                 reply_markup=kb)
+                await UserStates.show_master_state.set()
+                await state.update_data(master_sphere=callback.data)
+            else:
+                await callback.message.edit_text(text=zaglushka_text,
+                                                 reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.show_master_state)
     async def show_master(callback: CallbackQuery, state: FSMContext):
         masters = get_masters()
         data = await state.get_data()
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case _:
-                await callback.message.edit_text(text=masters[data['master_sphere']][callback.data],
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+        else:
+            await callback.message.edit_text(text=masters[data['master_sphere']][callback.data],
                                                  reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case 'meet_port':
-                await callback.message.edit_text(trans_vis_text_1)
-                await UserStates.final_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+        if callback.data ==  'meet_port':
+            await callback.message.edit_text(trans_vis_text_1)
+            await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
 
-            case 'from_c_to_c':
-                await callback.message.edit_text(trans_vis_text_2)
-                await UserStates.final_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
+        if callback.data == 'from_c_to_c':
+            await callback.message.edit_text(trans_vis_text_2)
+            await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
 
-            case 'visarun':
-                await callback.message.edit_text(trans_vis_text_3)
-                await UserStates.final_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
+        if callback.data == 'visarun':
+            await callback.message.edit_text(trans_vis_text_3)
+            await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.realty_state)
     async def realty_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-                return
-            case 'rent':
-                await callback.message.edit_text(realty_text_1)
-                await UserStates.final_state.set()
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+            return
+        elif callback.data == 'rent':
+            await callback.message.edit_text(realty_text_1)
+            await UserStates.final_state.set()
 
-            case 'buy':
-                await callback.message.edit_text(realty_text_2)
-                await UserStates.final_state.set()
+        elif callback.data == 'buy':
+            await callback.message.edit_text(realty_text_2)
+            await UserStates.final_state.set()
 
-            case 'give_rent':
-                await callback.message.answer(realty_text_3, reply_markup=realty_final_kb)
-                await UserStates.realty_final_state.set()
+        elif callback.data == 'give_rent':
+            await callback.message.answer(realty_text_3, reply_markup=realty_final_kb)
+            await UserStates.realty_final_state.set()
 
-            case 'sell':
-                await callback.message.answer(realty_text_4, reply_markup=realty_final_kb)
-                await UserStates.realty_final_state.set()
+        elif callback.data == 'sell':
+            await callback.message.answer(realty_text_4, reply_markup=realty_final_kb)
+            await UserStates.realty_final_state.set()
         await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.residence_state)
     async def residence_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
-                await UserStates.start_state.set()
-            case 'get_residence':
-                await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
-                await UserStates.vnj_state.set()
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+        if callback.data == 'get_residence':
+            await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
+            await UserStates.vnj_state.set()
 
-            case _:
-                await callback.message.answer(text=residence_docs_text)
-                await UserStates.final_state.set()
-                await state.update_data(option=buttons_name_dict[callback.data])
+        else:
+            await callback.message.answer(text=residence_docs_text)
+            await UserStates.final_state.set()
+            await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.gruz_state)
     async def gruz_options(callback: CallbackQuery, state: FSMContext):
@@ -253,49 +245,47 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.vnj_state)
     async def vnj_options(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'open_company':
-                await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
-                await UserStates.vnj_middle_state.set()
-            case 'realty_ownership':
-                await callback.message.answer(text=vremennie_trudnosti)
-                await UserStates.final_state.set()
-            case 'employer':
-                await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
-                await UserStates.vnj_middle_state.set()
-            case 'other':
-                await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
-                await UserStates.start_state.set()
-            case 'back':
-                await callback.message.edit_text(text=option_text, reply_markup=residence_docs_kb)
-                await UserStates.residence_state.set()
-                return
+        if callback.data == 'open_company':
+            await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
+            await UserStates.vnj_middle_state.set()
+        elif callback.data == 'realty_ownership':
+            await callback.message.answer(text=vremennie_trudnosti)
+            await UserStates.final_state.set()
+        elif callback.data == 'employer':
+            await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
+            await UserStates.vnj_middle_state.set()
+        elif callback.data == 'other':
+            await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
+            await UserStates.start_state.set()
+        elif callback.data == 'back':
+            await callback.message.edit_text(text=option_text, reply_markup=residence_docs_kb)
+            await UserStates.residence_state.set()
+            return
         await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.vnj_middle_state)
     async def vnj_middle(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case 'show_docs':
-                await callback.message.edit_text(
-                    text=vnj_docs_text,
-                    reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
+        if callback.data == 'show_docs':
+            await callback.message.edit_text(
+                text=vnj_docs_text,
+                reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
 
-            case 'ask_questions':
-                await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
-                await UserStates.start_state.set()
-            case 'upload_docs':
-                await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
-                await UserStates.get_documents_state.set()
-            case 'back':
-                await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
-                await UserStates.vnj_state.set()
-                return
-            case 'back2':
-                await callback.message.answer(text=vnj_text, reply_markup=open_company_kb)
-            case 'yes' | 'no':
-                await callback.message.answer(text=zaglushka_text)
-                await UserStates.start_state.set()
-                await callback.message.answer(start_text.format(callback.message.chat.full_name), reply_markup=start_kb)
+        elif callback.data == 'ask_questions':
+            await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
+            await UserStates.start_state.set()
+        elif callback.data == 'upload_docs':
+            await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
+            await UserStates.get_documents_state.set()
+        elif callback.data == 'back':
+            await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
+            await UserStates.vnj_state.set()
+            return
+        elif callback.data == 'back2':
+            await callback.message.answer(text=vnj_text, reply_markup=open_company_kb)
+        elif callback.data in ('yes', 'no'):
+            await callback.message.answer(text=zaglushka_text)
+            await UserStates.start_state.set()
+            await callback.message.answer(start_text.format(callback.message.chat.full_name), reply_markup=start_kb)
 
     @dp.message_handler(state=UserStates.get_documents_state, content_types=('photo', 'document', 'text'))
     async def get_documents(message: Message, state: FSMContext):
