@@ -125,7 +125,7 @@ def register_admin_handlers(dp: Dispatcher):
                                                f"Введите новое название и описание мастера.", parse_mode="Markdown")
             await state.update_data(master=callback.data)
             await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
-        if data['option'] ==  "remove_master":
+        elif data['option'] ==  "remove_master":
             del masters[data['current_tab']][callback.data]
             update_masters(masters)
 
