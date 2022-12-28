@@ -13,12 +13,12 @@ def generate_order():
     return random.randint(100000, 999999)
 
 
-def get_masters() -> dict:
+def get_masters():
     with open('masters.json', encoding='utf-8') as d:
         return json.load(d)
 
 
-def kb_from_dict(d: dict) -> InlineKeyboardMarkup | None:
+def kb_from_dict(d: dict):
     if d.keys():
         return InlineKeyboardMarkup(row_width=1).add(*[InlineKeyboardButton(text=i, callback_data=i)
                                                        for i in d.keys()])
@@ -26,6 +26,6 @@ def kb_from_dict(d: dict) -> InlineKeyboardMarkup | None:
         return
 
 
-def update_masters(new_dict) -> None:
+def update_masters(new_dict):
     with open('masters.json', 'w', encoding='utf-8') as d:
         json.dump(new_dict, d, ensure_ascii=False)
