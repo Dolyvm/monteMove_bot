@@ -21,6 +21,8 @@ from utils import start_text, option_text, exchange_text, final_text, exchange_o
     vremennie_trudnosti
 
 
+CHAT_ID = -1001638112743 
+
 class UserStates(StatesGroup):
     get_main_number_state = State()
     start_state = State()
@@ -136,7 +138,7 @@ def register_user_handlers(dp: Dispatcher):
         order = generateOrder()
         await state.update_data(order=order)
         await message.answer(text=final_text.format(order))
-        await message.bot.send_message(chat_id=-1001591695557,
+        await message.bot.send_message(chat_id=CHAT_ID,
                                        text=exchange_order_text.format(order, 'тачка',
                                                                        data['text'] + '\n\n' + message.text))
         await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
@@ -305,12 +307,12 @@ def register_user_handlers(dp: Dispatcher):
                 media_photo.attach_photo(i)
             for i in data.get('documents', []):
                 media_documents.attach_document(i)
-            await message.bot.send_message(chat_id=-1001591695557,
+            await message.bot.send_message(chat_id=CHAT_ID,
                                            text=exchange_order_text.format(
                                                order, data['option'], "\n".join(data['text'])))
             with suppress(ValidationError):
-                await message.bot.send_media_group(chat_id=-1001591695557, media=media_photo)
-                await message.bot.send_media_group(chat_id=-1001591695557, media=media_documents)
+                await message.bot.send_media_group(chat_id=CHAT_ID, media=media_photo)
+                await message.bot.send_media_group(chat_id=CHAT_ID, media=media_documents)
             await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
             await state.update_data(photos=[])
             await state.update_data(documents=[])
@@ -339,7 +341,7 @@ def register_user_handlers(dp: Dispatcher):
         await state.update_data(text=message.text)
         data = await state.get_data()
         await message.answer(text=final_text.format(order))
-        await message.bot.send_message(chat_id=-1001591695557,
+        await message.bot.send_message(chat_id=CHAT_ID,
                                        text=exchange_order_text.format(order, data['option'], message.text))
         await UserStates.get_main_number_state.set()
         await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
@@ -359,10 +361,10 @@ def register_user_handlers(dp: Dispatcher):
             media = MediaGroup()
             for i in data['photos']:
                 media.attach_photo(i)
-            await message.bot.send_message(chat_id=-1001591695557,
+            await message.bot.send_message(chat_id=CHAT_ID,
                                            text=exchange_order_text.format(order, data['option'],
                                                                            '\n'.join(data['text'])))
-            await message.bot.send_media_group(chat_id=-1001591695557, media=media)
+            await message.bot.send_media_group(chat_id=CHAT_ID, media=media)
             await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
             await state.update_data(photos=[])
             await state.update_data(text=[])
