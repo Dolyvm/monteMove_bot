@@ -178,17 +178,17 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
-        if callback.data ==  'meet_port':
+        elif callback.data ==  'meet_port':
             await callback.message.edit_text(trans_vis_text_1)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
 
-        if callback.data == 'from_c_to_c':
+        elif callback.data == 'from_c_to_c':
             await callback.message.edit_text(trans_vis_text_2)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
 
-        if callback.data == 'visarun':
+        elif callback.data == 'visarun':
             await callback.message.edit_text(trans_vis_text_3)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
@@ -223,7 +223,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
-        if callback.data == 'get_residence':
+        elif callback.data == 'get_residence':
             await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
             await UserStates.vnj_state.set()
 
