@@ -48,35 +48,34 @@ def register_admin_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=AdminPanelStates.AP_START_STATE)
     async def ap_choose_option(callback: CallbackQuery, state: FSMContext):
-        match callback.data:
-            case "add_tab":
-                await callback.message.edit_text(text="Введите название новой вкладки")
-                await AdminPanelStates.GET_NEW_TAB_NAME_STATE.set()
-            case "add_master":
-                await state.update_data(option="add_master")
-                await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
-                                                 reply_markup=kb_from_dict(get_masters()))
-                await AdminPanelStates.CHOOSE_TAB_STATE.set()
-            case "edit_master":
-                await state.update_data(option="edit_master")
-                await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
-                                                 reply_markup=kb_from_dict(get_masters()))
-                await AdminPanelStates.CHOOSE_TAB_STATE.set()
-            case "remove_master":
-                await state.update_data(option="remove_master")
-                await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
-                                                 reply_markup=kb_from_dict(get_masters()))
-                await AdminPanelStates.CHOOSE_TAB_STATE.set()
-            case "edit_tab":
-                await state.update_data(option="edit_tab")
-                await callback.message.edit_text(text="Выберите вкладку, название которой хотите изменить",
-                                                 reply_markup=kb_from_dict(get_masters()))
-                await AdminPanelStates.CHOOSE_TAB_STATE.set()
-            case "remove_tab":
-                await state.update_data(option="remove_tab")
-                await callback.message.edit_text(text="Выберите вкладку, которую хотите удалить",
-                                                 reply_markup=kb_from_dict(get_masters()))
-                await AdminPanelStates.CHOOSE_TAB_STATE.set()
+        if callback.data == "add_tab":
+            await callback.message.edit_text(text="Введите название новой вкладки")
+            await AdminPanelStates.GET_NEW_TAB_NAME_STATE.set()
+        elif callback.data == "add_master":
+            await state.update_data(option="add_master")
+            await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
+                                             reply_markup=kb_from_dict(get_masters()))
+            await AdminPanelStates.CHOOSE_TAB_STATE.set()
+        elif callback.data == "edit_master":
+            await state.update_data(option="edit_master")
+            await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
+                                             reply_markup=kb_from_dict(get_masters()))
+            await AdminPanelStates.CHOOSE_TAB_STATE.set()
+        elif callback.data ==  "remove_master":
+            await state.update_data(option="remove_master")
+            await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
+                                             reply_markup=kb_from_dict(get_masters()))
+            await AdminPanelStates.CHOOSE_TAB_STATE.set()
+        elif callback.data == "edit_tab":
+            await state.update_data(option="edit_tab")
+            await callback.message.edit_text(text="Выберите вкладку, название которой хотите изменить",
+                                             reply_markup=kb_from_dict(get_masters()))
+            await AdminPanelStates.CHOOSE_TAB_STATE.set()
+        elif callback.data == "remove_tab":
+            await state.update_data(option="remove_tab")
+            await callback.message.edit_text(text="Выберите вкладку, которую хотите удалить",
+                                             reply_markup=kb_from_dict(get_masters()))
+            await AdminPanelStates.CHOOSE_TAB_STATE.set()
 
     @dp.callback_query_handler(state=AdminPanelStates.CHOOSE_TAB_STATE)
     async def ap_choose_tab(callback: CallbackQuery, state: FSMContext):
@@ -120,21 +119,20 @@ def register_admin_handlers(dp: Dispatcher):
     async def ap_choose_master(callback: CallbackQuery, state: FSMContext):
         data = await state.get_data()
         masters = get_masters()
-        match data['option']:
-            case "edit_master":
-                await callback.message.answer(text=f"```\n{callback.data}\n"
-                                                   f"{masters[data['current_tab']][callback.data]}```\n"
-                                                   f"Введите новое название и описание мастера.", parse_mode="Markdown")
-                await state.update_data(master=callback.data)
-                await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
-            case "remove_master":
-                del masters[data['current_tab']][callback.data]
-                update_masters(masters)
+        if data['option'] == 'edit_master':
+            await callback.message.answer(text=f"```\n{callback.data}\n"
+                                               f"{masters[data['current_tab']][callback.data]}```\n"
+                                               f"Введите новое название и описание мастера.", parse_mode="Markdown")
+            await state.update_data(master=callback.data)
+            await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
+        if data['option'] ==  "remove_master":
+            del masters[data['current_tab']][callback.data]
+            update_masters(masters)
 
-                await callback.message.answer("Мастер успешно удален.")
-                # Перекидываем в начало
-                await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
-                await AdminPanelStates.AP_START_STATE.set()
+            await callback.message.answer("Мастер успешно удален.")
+            # Перекидываем в начало
+            await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
+            await AdminPanelStates.AP_START_STATE.set()
 
     @dp.message_handler(state=AdminPanelStates.GET_NEW_TAB_NAME_STATE)
     async def get_new_tab(message: Message, state: FSMContext):
