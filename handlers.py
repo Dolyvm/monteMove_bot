@@ -20,8 +20,8 @@ from utils import start_text, option_text, exchange_text, final_text, exchange_o
     rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text, \
     vremennie_trudnosti
 
+CHAT_ID = -1001638112743
 
-CHAT_ID = -1001638112743 
 
 class UserStates(StatesGroup):
     get_main_number_state = State()
@@ -61,44 +61,43 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.exchange_state.set()
             await state.update_data(category='Обмен Валют')
         elif callback.data == 'residence/docs':
-                await callback.message.edit_text(option_text, reply_markup=residence_docs_kb)
-                await UserStates.residence_state.set()
-                await state.update_data(category='ВНЖ/Документы')
+            await callback.message.edit_text(option_text, reply_markup=residence_docs_kb)
+            await UserStates.residence_state.set()
+            await state.update_data(category='ВНЖ/Документы')
         elif callback.data == 'auto':
-                await callback.message.edit_text(text='Аренда авто', reply_markup=auto_kb)
-                await UserStates.auto_state.set()
-                await state.update_data(category='Авто')
-
+            await callback.message.edit_text(text='Аренда авто', reply_markup=auto_kb)
+            await UserStates.auto_state.set()
+            await state.update_data(category='Авто')
         elif callback.data == 'transfer':
-                await callback.message.edit_text(option_text, reply_markup=trans_vis_kb)
-                await UserStates.transfer_state.set()
-                await state.update_data(category='Трансферы/Визаран')
+            await callback.message.edit_text(option_text, reply_markup=trans_vis_kb)
+            await UserStates.transfer_state.set()
+            await state.update_data(category='Трансферы/Визаран')
         elif callback.data == 'gruz':
-                await callback.message.edit_text(option_text, reply_markup=gruz_kb)
-                await UserStates.gruz_state.set()
-                await state.update_data(category='Грузоперевозки')
+            await callback.message.edit_text(option_text, reply_markup=gruz_kb)
+            await UserStates.gruz_state.set()
+            await state.update_data(category='Грузоперевозки')
         elif callback.data == 'realty':
-                await callback.message.edit_text(option_text, reply_markup=realty_kb)
-                await UserStates.realty_state.set()
-                await state.update_data(category='Недвижимость')
-
+            await callback.message.edit_text(option_text, reply_markup=realty_kb)
+            await UserStates.realty_state.set()
+            await state.update_data(category='Недвижимость')
         elif callback.data == 'masters':
-                await callback.message.edit_text(option_text, reply_markup=kb_from_dict(get_masters()))
-                await UserStates.master_state.set()
-                await state.update_data(category='Мастера')
+            kb = kb_from_dict(get_masters()).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.master_state.set()
+            await state.update_data(category='Мастера')
         elif callback.data == 'byt':
-                await callback.message.edit_text(byt_text, reply_markup=url_kb)
-                await UserStates.master_state.set()
-                await state.update_data(category='Быт')
+            await callback.message.edit_text(byt_text, reply_markup=url_kb)
+            await UserStates.master_state.set()
+            await state.update_data(category='Быт')
         elif callback.data == 'back':
-                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
 
     @dp.callback_query_handler(state=UserStates.exchange_state)
     async def exchange_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == "back":
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                                 reply_markup=start_kb)
+                                             reply_markup=start_kb)
             await UserStates.start_state.set()
         elif callback.data == 'other':
             await state.update_data(option=buttons_name_dict[callback.data])
@@ -151,28 +150,31 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
+            return
         else:
             kb = kb_from_dict(masters[callback.data])
             if kb:
+                kb.add(back_button)
                 await callback.message.edit_text(text='Список мастеров:',
                                                  reply_markup=kb)
-                await UserStates.show_master_state.set()
                 await state.update_data(master_sphere=callback.data)
             else:
                 await callback.message.edit_text(text=zaglushka_text,
                                                  reply_markup=back_kb)
+        await UserStates.show_master_state.set()
 
     @dp.callback_query_handler(state=UserStates.show_master_state)
     async def show_master(callback: CallbackQuery, state: FSMContext):
         masters = get_masters()
         data = await state.get_data()
         if callback.data == "back":
-            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                             reply_markup=start_kb)
-            await UserStates.start_state.set()
+            kb = kb_from_dict(get_masters()).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.master_state.set()
+            await state.update_data(category='Мастера')
         else:
             await callback.message.edit_text(text=masters[data['master_sphere']][callback.data],
-                                                 reply_markup=back_kb)
+                                             reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
     async def transfer_options(callback: CallbackQuery, state: FSMContext):
@@ -180,7 +182,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
-        elif callback.data ==  'meet_port':
+        elif callback.data == 'meet_port':
             await callback.message.edit_text(trans_vis_text_1)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
