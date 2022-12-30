@@ -7,7 +7,7 @@ from datetime import datetime
 
 gc = gspread.service_account(filename="credit.json")
 
-sh = gc.open("Все заявки")
+sh = gc.open("БОТ")
 
 worksheet = sh.get_worksheet(0)
 
