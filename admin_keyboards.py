@@ -24,5 +24,7 @@ ap_start_kb = InlineKeyboardMarkup(row_width=1).add(*[
     InlineKeyboardButton("Изменить инфу о мастере", callback_data="edit_master"),
     InlineKeyboardButton("Удалить мастера", callback_data="remove_master"),
     InlineKeyboardButton("Изменить название вкладки", callback_data="edit_tab"),
-    InlineKeyboardButton("Удалить вкладку", callback_data="remove_tab")
+    InlineKeyboardButton("Удалить вкладку", callback_data="remove_tab"),
+    InlineKeyboardButton("Посмотреть статистику за месяц", callback_data="check_stats")
+
 ])

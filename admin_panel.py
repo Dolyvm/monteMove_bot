@@ -1,25 +1,15 @@
 import json
-import aiogram
-from aiogram import Dispatcher, Bot
+
+from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGroup, ReplyKeyboardRemove, \
-    InlineKeyboardButton, Contact
-from aiogram.utils.exceptions import ValidationError
+from aiogram.types import Message, CallbackQuery, InputFile
 
-from admin_keyboards import start_admin_kb, sphere_options_kb, ap_start_kb
+from admin_keyboards import ap_start_kb
 from functions import kb_from_dict, get_masters, update_masters
-from table_ctrl import generateOrder
-from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
-    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request, \
-    beauty_masters_kb
-from table_ctrl import update_table
-from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
-    gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
-    realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text
+from statistics.stats_functions import create_month_stats
 
-admins = []
+admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155]
 
 
 def edit_tab_name(tab, name):
@@ -41,8 +31,8 @@ class AdminPanelStates(StatesGroup):
 
 def register_admin_handlers(dp: Dispatcher):
     # @dp.message_handler(lambda message: message.chat.id in admins, commands=['open_panel'], state='*')
-    @dp.message_handler(commands=['open_panel'], state='*')
-    async def open_panel(message: Message, state: FSMContext):
+    @dp.message_handler(commands=['open_panel'], state='*', chat_id=admins)
+    async def open_panel(message: Message):
         await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
         await AdminPanelStates.AP_START_STATE.set()
 
@@ -61,7 +51,7 @@ def register_admin_handlers(dp: Dispatcher):
             await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
                                              reply_markup=kb_from_dict(get_masters()))
             await AdminPanelStates.CHOOSE_TAB_STATE.set()
-        elif callback.data ==  "remove_master":
+        elif callback.data == "remove_master":
             await state.update_data(option="remove_master")
             await callback.message.edit_text(text="Выберите вкладку, в которой находится мастер",
                                              reply_markup=kb_from_dict(get_masters()))
@@ -76,6 +66,10 @@ def register_admin_handlers(dp: Dispatcher):
             await callback.message.edit_text(text="Выберите вкладку, которую хотите удалить",
                                              reply_markup=kb_from_dict(get_masters()))
             await AdminPanelStates.CHOOSE_TAB_STATE.set()
+
+        elif callback.data == "check_stats":
+            create_month_stats()
+            await callback.message.answer_photo(photo=InputFile('statistics/stats.png'))
 
     @dp.callback_query_handler(state=AdminPanelStates.CHOOSE_TAB_STATE)
     async def ap_choose_tab(callback: CallbackQuery, state: FSMContext):
@@ -100,8 +94,8 @@ def register_admin_handlers(dp: Dispatcher):
 
         if data['option'] == "add_master":
             await callback.message.answer(text="Введите название мастера и информацию о нем в следующем виде:\n"
-                                      "Название мастера\n"
-                                      "Информация (на следующей строке)")
+                                               "Название мастера\n"
+                                               "Информация (на следующей строке)")
             await state.update_data(current_tab=callback.data)
             await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
             return
@@ -125,7 +119,7 @@ def register_admin_handlers(dp: Dispatcher):
                                                f"Введите новое название и описание мастера.", parse_mode="Markdown")
             await state.update_data(master=callback.data)
             await AdminPanelStates.GET_NEW_MASTER_NAME_STATE.set()
-        elif data['option'] ==  "remove_master":
+        elif data['option'] == "remove_master":
             del masters[data['current_tab']][callback.data]
             update_masters(masters)
 
@@ -180,4 +174,3 @@ def register_admin_handlers(dp: Dispatcher):
         # Перекидываем в начало
         await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
         await AdminPanelStates.AP_START_STATE.set()
-

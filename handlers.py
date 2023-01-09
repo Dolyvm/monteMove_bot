@@ -9,6 +9,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGro
 from aiogram.utils.exceptions import ValidationError
 
 from functions import get_masters, kb_from_dict
+from statistics.stats_functions import append_visitor
 from table_ctrl import generateOrder
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request, \
@@ -51,8 +52,9 @@ def register_user_handlers(dp: Dispatcher):
     @dp.message_handler(commands=['start', 'help'], state='*')
     async def start(message: Message, state: FSMContext):
         await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
-        await state.update_data(text=[])
+        await state.update_data(text=list())
         await UserStates.start_state.set()
+        append_visitor(message.from_user.id)
 
     @dp.callback_query_handler(state=UserStates.start_state)
     async def start_options(callback: CallbackQuery, state: FSMContext):
