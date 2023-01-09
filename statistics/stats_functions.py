@@ -1,3 +1,5 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 import calendar
 import datetime
 import json
@@ -6,15 +8,14 @@ import pandas as pd
 
 calendar = calendar.Calendar()
 
-
-def get_stats() -> dict:
-    with open("statistics/statistics.json") as stats:
-        return json.load(stats)
+scheduler = AsyncIOScheduler()
 
 
-def upload_stats(new_stats):
-    with open("statistics/statistics.json", 'w') as stats:
-        json.dump(new_stats, stats)
+async def remove_visitors():
+    with open("statistics/today_visitors.json", "w") as data:
+        json.dump(list(), data)
+    print("Visitors removed.")
+scheduler.add_job(remove_visitors, 'cron', day="*")
 
 
 def get_today_visitors():
@@ -31,9 +32,14 @@ def append_visitor(user_id):
         update_stats()
 
 
-def remove_visitors():
-    with open("statistics/today_visitors.json", "w") as data:
-        json.dump(list(), data)
+def get_stats() -> dict:
+    with open("statistics/statistics.json") as stats:
+        return json.load(stats)
+
+
+def upload_stats(new_stats):
+    with open("statistics/statistics.json", 'w') as stats:
+        json.dump(new_stats, stats)
 
 
 def build_year_stats(year):
