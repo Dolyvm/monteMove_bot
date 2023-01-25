@@ -1,27 +1,27 @@
 from contextlib import suppress
 
-import aiogram
-from aiogram import Dispatcher, Bot
+from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGroup, ReplyKeyboardRemove, \
-    InlineKeyboardButton, Contact
+    InlineKeyboardButton, Contact, User
 from aiogram.utils.exceptions import ValidationError
 
 from functions import get_masters, kb_from_dict
+from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
+    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, url_kb, auto_kb, number_request, \
+    back_kb
 from statistics.stats_functions import append_visitor
 from table_ctrl import generateOrder
-from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
-    realty_final_kb, residence_options_kb, open_company_kb, employer_kb, masters_kb, url_kb, auto_kb, number_request, \
-    beauty_masters_kb, back_kb
 from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, beauty_text, other_text, \
+    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, other_text, \
     vremennie_trudnosti
 
-CHAT_ID = -1001638112743
+# CHAT_ID = -1001638112743  # Prod
+CHAT_ID = -1001591695557  # Test
 
 
 class UserStates(StatesGroup):
@@ -270,7 +270,7 @@ def register_user_handlers(dp: Dispatcher):
         await state.update_data(option=buttons_name_dict[callback.data])
 
     @dp.callback_query_handler(state=UserStates.vnj_middle_state)
-    async def vnj_middle(callback: CallbackQuery, state: FSMContext):
+    async def vnj_middle(callback: CallbackQuery):
         if callback.data == 'show_docs':
             await callback.message.edit_text(
                 text=vnj_docs_text,
@@ -295,10 +295,9 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.message_handler(state=UserStates.get_documents_state, content_types=('photo', 'document', 'text'))
     async def get_documents(message: Message, state: FSMContext):
-        print(dict(message))
         if message.text == 'Завершить отправку файлов':
-            order = generateOrder()
-            await state.update_data(order=order)
+            # order = generateOrder()
+            # await state.update_data(order=order)
             data = await state.get_data()
             if not data.get('text', None):
                 await message.answer(text='Отправьте требуемый текст')
@@ -306,21 +305,23 @@ def register_user_handlers(dp: Dispatcher):
             if not data.get('photos', None) and not data.get('documents', None):
                 await message.answer(text='Добавьте требуемые документы')
                 return
-            media_photo = MediaGroup()
-            media_documents = MediaGroup()
-            for i in data.get('photos', []):
-                media_photo.attach_photo(i)
-            for i in data.get('documents', []):
-                media_documents.attach_document(i)
-            await message.bot.send_message(chat_id=CHAT_ID,
-                                           text=exchange_order_text.format(
-                                               order, data['option'], "\n".join(data['text'])))
-            with suppress(ValidationError):
-                await message.bot.send_media_group(chat_id=CHAT_ID, media=media_photo)
-                await message.bot.send_media_group(chat_id=CHAT_ID, media=media_documents)
-            await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
-            await state.update_data(photos=[])
-            await state.update_data(documents=[])
+
+            # Все проверки прошли
+            # media_photo = MediaGroup()
+            # media_documents = MediaGroup()
+            # for i in data.get('photos', []):
+            #     media_photo.attach_photo(i)
+            # for i in data.get('documents', []):
+            #     media_documents.attach_document(i)
+            # await message.bot.send_message(chat_id=CHAT_ID,
+            #                                text=exchange_order_text.format(
+            #                                    order, data['option'], "\n".join(data['text'])))
+            # with suppress(ValidationError):
+            #     await message.bot.send_media_group(chat_id=CHAT_ID, media=media_photo)
+            #     await message.bot.send_media_group(chat_id=CHAT_ID, media=media_documents)
+            # await message.answer(text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
+            # await state.update_data(photos=[])
+            # await state.update_data(documents=[])
             await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
             await UserStates.get_main_number_state.set()
         elif message.text:
@@ -389,21 +390,43 @@ def register_user_handlers(dp: Dispatcher):
             await state.update_data(photos=photos)
 
     @dp.message_handler(content_types=['contact'], state=UserStates.get_main_number_state)
-    async def getContactMain(number: Contact, state: FSMContext):
+    async def get_contact_main(number: Contact, state: FSMContext):
         data = await state.get_data()
-        await number.bot.send_message(chat_id=number["from"]["id"],
-                                      text="⏳",
-                                      reply_markup=ReplyKeyboardRemove())
-        await state.update_data(number=number["contact"]["phone_number"])
-        await state.update_data(text=[])
-        await UserStates.start_state.set()
-        await number.bot.send_message(
-            chat_id=number["from"]["id"],
-            text=start_text.format(number["from"]["first_name"] + (number["from"]["last_name"] or '')),
-            reply_markup=start_kb)
-
+        order = generateOrder()
+        await state.update_data(order=order)
+        # await number.bot.send_message(chat_id=number["from"]["id"],
+        #                               text="⏳",
+        #                               reply_markup=ReplyKeyboardRemove())
+        # await state.update_data(number=number["contact"]["phone_number"])
+        # await state.update_data(text=[])
+        # await UserStates.start_state.set()
+        # await number.bot.send_message(
+        #     chat_id=number["from"]["id"],
+        #     text=start_text.format(number["from"]["first_name"] + (number["from"]["last_name"] or '')),
+        #     reply_markup=start_kb)
+        #
         update_table(category=data["category"],
                      option=data["option"],
                      number=number["contact"]["phone_number"],
                      text=data['text'] if type(data['text']) == str else "\n".join(data['text']),
-                     order=data["order"])
+                     order=order)
+        media_photo = MediaGroup()
+        media_documents = MediaGroup()
+        for i in data.get('photos', []):
+            media_photo.attach_photo(i)
+        for i in data.get('documents', []):
+            media_documents.attach_document(i)
+        await number.bot.send_message(
+            chat_id=CHAT_ID,
+            text=f"@{dict(number['from']).get('username', '')}\n{number['contact']['phone_number']}\n" \
+                 + exchange_order_text.format(order, data['option'], "\n".join(data['text'])))
+
+        with suppress(ValidationError):
+            await number.bot.send_media_group(chat_id=CHAT_ID, media=media_photo)
+        with suppress(ValidationError):
+            await number.bot.send_media_group(chat_id=CHAT_ID, media=media_documents)
+
+        await number.bot.send_message(chat_id=number["from"]["id"],
+                                      text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
+        await state.update_data(photos=[])
+        await state.update_data(documents=[])
