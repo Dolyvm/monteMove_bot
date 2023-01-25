@@ -295,6 +295,7 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.message_handler(state=UserStates.get_documents_state, content_types=('photo', 'document', 'text'))
     async def get_documents(message: Message, state: FSMContext):
+        print(dict(message))
         if message.text == 'Завершить отправку файлов':
             order = generateOrder()
             await state.update_data(order=order)
@@ -302,7 +303,7 @@ def register_user_handlers(dp: Dispatcher):
             if not data.get('text', None):
                 await message.answer(text='Отправьте требуемый текст')
                 return
-            if not data.get('photos', None):
+            if not data.get('photos', None) and not data.get('documents', None):
                 await message.answer(text='Добавьте требуемые документы')
                 return
             media_photo = MediaGroup()
@@ -334,6 +335,7 @@ def register_user_handlers(dp: Dispatcher):
             await state.update_data(photos=photos)
         elif message.document:
             data = await state.get_data()
+            print(f"{data = }")
             documents: list = data.get('documents', [])
             documents.append(message.document.file_id)
             await state.update_data(documents=documents)
