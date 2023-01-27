@@ -10,7 +10,7 @@ from aiogram.utils.exceptions import ValidationError
 from functions import get_masters, kb_from_dict
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, url_kb, auto_kb, number_request, \
-    back_kb
+    back_kb, yur_kb
 from statistics.stats_functions import append_visitor
 from table_ctrl import generateOrder
 from table_ctrl import update_table
@@ -18,13 +18,14 @@ from utils import start_text, option_text, exchange_text, final_text, exchange_o
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
     rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, other_text, \
-    vremennie_trudnosti
+    vremennie_trudnosti, yur_face_text
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
 
 
 class UserStates(StatesGroup):
+    yur_state = State()
     get_main_number_state = State()
     start_state = State()
     exchange_state = State()
@@ -260,6 +261,9 @@ def register_user_handlers(dp: Dispatcher):
         elif callback.data == 'employer':
             await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
             await UserStates.vnj_middle_state.set()
+        elif callback.data == "yur_face":
+            await callback.message.edit_text(text=yur_face_text, reply_markup=yur_kb)
+            await UserStates.yur_state.set()
         elif callback.data == 'other':
             await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
@@ -268,6 +272,20 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.residence_state.set()
             return
         await state.update_data(option=buttons_name_dict[callback.data])
+
+    @dp.callback_query_handler(state=UserStates.yur_state)
+    async def yur_options(callback: CallbackQuery, state: FSMContext):
+        await state.update_data(option="ВНЖ на основании юр.лица")
+        if callback.data == "send_docs":
+            await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
+            await UserStates.get_documents_state.set()
+        elif callback.data == 'ask_questions':
+            await callback.message.answer(text='Контакты менеджера: @Monte_Move \nДля перехода в начало введите /start')
+            await UserStates.start_state.set()
+        elif callback.data == 'back':
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
 
     @dp.callback_query_handler(state=UserStates.vnj_middle_state)
     async def vnj_middle(callback: CallbackQuery):
