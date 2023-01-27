@@ -18,7 +18,7 @@ from utils import start_text, option_text, exchange_text, final_text, exchange_o
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
     rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, other_text, \
-    vremennie_trudnosti
+    vremennie_trudnosti, oreder_text, exchange_hi_text, criminal_record_text
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
@@ -46,6 +46,7 @@ class UserStates(StatesGroup):
     assistance_state = State()
     beauty_masters_state = State()
     show_master_state = State()
+    criminal_record_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -59,7 +60,7 @@ def register_user_handlers(dp: Dispatcher):
     @dp.callback_query_handler(state=UserStates.start_state)
     async def start_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == 'exchange':
-            await callback.message.edit_text(option_text, reply_markup=exchange_kb)
+            await callback.message.edit_text(exchange_hi_text, reply_markup=exchange_kb)
             await UserStates.exchange_state.set()
             await state.update_data(category='Обмен Валют')
         elif callback.data == 'residence/docs':
@@ -101,15 +102,15 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
-        elif callback.data == 'other':
+        elif callback.data == 'leave_order':
             await state.update_data(option=buttons_name_dict[callback.data])
-            await callback.message.edit_text(other_text)
+            await callback.message.edit_text(oreder_text)
             await UserStates.final_state.set()
 
-        else:
-            await state.update_data(option=buttons_name_dict[callback.data])
-            await callback.message.edit_text(exchange_text)
-            await UserStates.final_state.set()
+      #else:
+      #    await state.update_data(option=buttons_name_dict[callback.data])
+      #    await callback.message.edit_text(exchange_text)
+      #    await UserStates.final_state.set()
 
     @dp.callback_query_handler(state=UserStates.auto_state)
     async def auto_options(callback: CallbackQuery, state: FSMContext):
@@ -232,11 +233,27 @@ def register_user_handlers(dp: Dispatcher):
         elif callback.data == 'get_residence':
             await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
             await UserStates.vnj_state.set()
+        elif callback.data == 'criminal_record':
+            await callback.message.edit_text(text=criminal_record_text, reply_markup=exchange_kb)
+            await UserStates.criminal_record_state.set()
 
         else:
             await callback.message.answer(text=residence_docs_text)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
+
+    @dp.callback_query_handler(state=UserStates.criminal_record_state)
+    async def criminal_state(callback: CallbackQuery, state: FSMContext):
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+        elif callback.data == 'leave_order':
+            await state.update_data(option=buttons_name_dict[callback.data])
+            await callback.message.answer(text=oreder_text)
+            await UserStates.final_state.set()
+
+
 
     @dp.callback_query_handler(state=UserStates.gruz_state)
     async def gruz_options(callback: CallbackQuery, state: FSMContext):

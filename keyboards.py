@@ -45,14 +45,15 @@ trans_vis_kb = InlineKeyboardMarkup(row_width=1).add(*(
     back_button
 ))
 
-exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Нал € за Безнал ₽', callback_data='eurorub'),
-    InlineKeyboardButton(text='Нал € за Криптовалюту', callback_data='crypto'),
+'''InlineKeyboardButton(text='Нал € за Криптовалюту', callback_data='crypto'),
     InlineKeyboardButton(text='Нал €$₽ МСК - Наличные € чрнг', callback_data='msk_chern'),
     InlineKeyboardButton(text='Нал €$₽ СПБ - Наличные € ЧРНГ', callback_data='spb_chern'),
     InlineKeyboardButton(text='Нал € в ЧРНГ за $€ на РФ Банках', callback_data='rf_bank'),
     InlineKeyboardButton(text='Онлайн сервисы / авиабилеты', callback_data='online_avia'),
-    InlineKeyboardButton(text='Другое', callback_data='other'),
+    InlineKeyboardButton(text='Другое', callback_data='other'),'''
+
+exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='Оставить заявку', callback_data='leave_order'),
     back_button
 ))
 
