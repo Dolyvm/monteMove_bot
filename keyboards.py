@@ -72,6 +72,7 @@ residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
     InlineKeyboardButton(text='ВНЖ на основании открытия фирмы', callback_data='open_company'),
     InlineKeyboardButton(text='ВНЖ на основе трудоустройства на фирму', callback_data='employer'),
+    InlineKeyboardButton(text='ВНЖ на основании открытии юр.лица', callback_data='yur_face'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
@@ -114,3 +115,9 @@ url_kb = InlineKeyboardMarkup(row_width=1).add(*(
 number_request = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
 number_button = KeyboardButton('Оставить номер', request_contact=True)
 number_request.add(number_button)
+
+yur_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='Прикрепить документы', callback_data='send_docs'),
+    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    back_button
+))
