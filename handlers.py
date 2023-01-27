@@ -442,6 +442,7 @@ def register_user_handlers(dp: Dispatcher):
         await number.bot.send_message(chat_id=number["from"]["id"],
                                       text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
         await number.bot.send_message(chat_id=number["from"]["id"],
-                                      text=start_text.format(number.full_name), reply_markup=ReplyKeyboardRemove())
+                                      text=start_text.format(number.first_name + " " + number.last_name),
+                                      reply_markup=ReplyKeyboardRemove())
         await state.update_data(photos=[])
         await state.update_data(documents=[])
