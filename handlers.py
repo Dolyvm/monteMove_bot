@@ -18,7 +18,7 @@ from utils import start_text, option_text, exchange_text, final_text, exchange_o
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
     rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, other_text, \
-    vremennie_trudnosti, oreder_text, exchange_hi_text, criminal_record_text
+    vremennie_trudnosti, oreder_text, exchange_hi_text, criminal_record_text, gruzz_text
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
@@ -47,6 +47,7 @@ class UserStates(StatesGroup):
     beauty_masters_state = State()
     show_master_state = State()
     criminal_record_state = State()
+    employer_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -260,7 +261,7 @@ def register_user_handlers(dp: Dispatcher):
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
         else:
-            await callback.message.answer(text=gruz_text)
+            await callback.message.answer(text=gruzz_text)
             await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
 
@@ -274,7 +275,7 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.final_state.set()
         elif callback.data == 'employer':
             await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
-            await UserStates.vnj_middle_state.set()
+            await UserStates.employer_state.set()
         elif callback.data == 'other':
             await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
@@ -284,6 +285,22 @@ def register_user_handlers(dp: Dispatcher):
             return
         await state.update_data(option=buttons_name_dict[callback.data])
 
+    @dp.callback_query_handler(state=UserStates.employer_state)
+    async def vnj_middle(callback: CallbackQuery, state: FSMContext):
+        if callback.data == 'leave_order':
+            await callback.message.answer(text='Прикрепите документы', reply_markup=realty_final_kb)
+            await state.update_data(option=buttons_name_dict[callback.data])
+            await UserStates.get_documents_state.set()
+        elif callback.data == 'ask_questions':
+            await callback.message.answer(text='Контакты менеджера: @Monte_Move \nДля перехода в начало введите /start')
+            await UserStates.start_state.set()
+        if callback.data == 'back':
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+
+
+
     @dp.callback_query_handler(state=UserStates.vnj_middle_state)
     async def vnj_middle(callback: CallbackQuery):
         if callback.data == 'show_docs':
@@ -292,7 +309,7 @@ def register_user_handlers(dp: Dispatcher):
                 reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
 
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: ... \nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Move  \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'upload_docs':
             await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
@@ -303,10 +320,6 @@ def register_user_handlers(dp: Dispatcher):
             return
         elif callback.data == 'back2':
             await callback.message.answer(text=vnj_text, reply_markup=open_company_kb)
-        elif callback.data in ('yes', 'no'):
-            await callback.message.answer(text=zaglushka_text)
-            await UserStates.start_state.set()
-            await callback.message.answer(start_text.format(callback.message.chat.full_name), reply_markup=start_kb)
 
     @dp.message_handler(state=UserStates.get_documents_state, content_types=('photo', 'document', 'text'))
     async def get_documents(message: Message, state: FSMContext):

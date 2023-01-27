@@ -84,8 +84,9 @@ open_company_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 employer_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Да', callback_data='yes'),
-    InlineKeyboardButton(text='Нет', callback_data='no'),
+    InlineKeyboardButton(text='Оставить заявку', callback_data='leave_order'),
+    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    back_button
 ))
 
 
