@@ -371,13 +371,8 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.message_handler(state=UserStates.final_state, content_types=('photo', 'text'))
     async def get_final(message: Message, state: FSMContext):
-        order = generateOrder()
-        await state.update_data(order=order)
-        await state.update_data(text=message.text)
-        data = await state.get_data()
-        await message.answer(text=final_text.format(order))
-        await message.bot.send_message(chat_id=CHAT_ID,
-                                       text=exchange_order_text.format(order, data['option'], message.text))
+        await state.update_data(text=[message.text])
+
         await UserStates.get_main_number_state.set()
         await message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
 
@@ -456,5 +451,7 @@ def register_user_handlers(dp: Dispatcher):
 
         await number.bot.send_message(chat_id=number["from"]["id"],
                                       text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
+        await number.bot.send_message(chat_id=number["from"]["id"],
+                                      text=start_text.format(number.full_name), reply_markup=ReplyKeyboardRemove())
         await state.update_data(photos=[])
         await state.update_data(documents=[])
