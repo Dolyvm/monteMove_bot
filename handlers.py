@@ -253,8 +253,6 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.answer(text=oreder_text)
             await UserStates.final_state.set()
 
-
-
     @dp.callback_query_handler(state=UserStates.gruz_state)
     async def gruz_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == 'back':
