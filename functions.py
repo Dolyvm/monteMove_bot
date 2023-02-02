@@ -18,6 +18,11 @@ def get_masters():
         return json.load(d)
 
 
+def get_dosug():
+    with open('dosug.json', encoding='utf-8') as d:
+        return json.load(d)
+
+
 def kb_from_dict(d: dict):
     if d.keys():
         return InlineKeyboardMarkup(row_width=1).add(*[InlineKeyboardButton(text=i, callback_data=i)
@@ -28,4 +33,9 @@ def kb_from_dict(d: dict):
 
 def update_masters(new_dict):
     with open('masters.json', 'w', encoding='utf-8') as d:
+        json.dump(new_dict, d, ensure_ascii=False)
+
+
+def update_dosug(new_dict):
+    with open('dosug.json', 'w', encoding='utf-8') as d:
         json.dump(new_dict, d, ensure_ascii=False)

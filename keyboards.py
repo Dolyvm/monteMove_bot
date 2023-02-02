@@ -8,6 +8,7 @@ start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
     InlineKeyboardButton(text='Проверенные мастера Черногории', callback_data='masters'),
+    InlineKeyboardButton(text='Досуг', callback_data='dosug'),
     InlineKeyboardButton(text='Быт', callback_data='byt'),
     InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Move'),
 ))

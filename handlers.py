@@ -7,7 +7,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGro
     InlineKeyboardButton, Contact, User
 from aiogram.utils.exceptions import ValidationError
 
-from functions import get_masters, kb_from_dict
+from functions import get_masters, kb_from_dict, get_dosug
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, url_kb, auto_kb, number_request, \
     back_kb, yur_kb
@@ -25,6 +25,8 @@ CHAT_ID = -1001591695557  # Test
 
 
 class UserStates(StatesGroup):
+    dosug_state = State()
+    show_dosug_state = State()
     yur_state = State()
     get_main_number_state = State()
     start_state = State()
@@ -88,6 +90,11 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.master_state.set()
             await state.update_data(category='Мастера')
+        elif callback.data == 'dosug':
+            kb = kb_from_dict(get_dosug()).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.dosug_state.set()
+            # await state.update_data(category='Мастера')
         elif callback.data == 'byt':
             await callback.message.edit_text(byt_text, reply_markup=url_kb)
             await UserStates.master_state.set()
@@ -171,12 +178,45 @@ def register_user_handlers(dp: Dispatcher):
         masters = get_masters()
         data = await state.get_data()
         if callback.data == "back":
-            kb = kb_from_dict(get_masters()).add(back_button)
+            kb = kb_from_dict(masters).add(back_button)
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.master_state.set()
             await state.update_data(category='Мастера')
         else:
             await callback.message.edit_text(text=masters[data['master_sphere']][callback.data],
+                                             reply_markup=back_kb)
+
+    @dp.callback_query_handler(state=UserStates.dosug_state)
+    async def dosug_options(callback: CallbackQuery, state: FSMContext):
+        dosug = get_dosug()
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+            return
+        else:
+            kb = kb_from_dict(dosug[callback.data])
+            if kb:
+                kb.add(back_button)
+                await callback.message.edit_text(text='Список доступных вариантов:',
+                                                 reply_markup=kb)
+                await state.update_data(dosug_sphere=callback.data)
+            else:
+                await callback.message.edit_text(text=zaglushka_text,
+                                                 reply_markup=back_kb)
+        await UserStates.show_dosug_state.set()
+
+    @dp.callback_query_handler(state=UserStates.show_dosug_state)
+    async def show_dosug(callback: CallbackQuery, state: FSMContext):
+        dosug = get_dosug()
+        data = await state.get_data()
+        if callback.data == "back":
+            kb = kb_from_dict(dosug).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.dosug_state.set()
+            # await state.update_data(category='Мастера')
+        else:
+            await callback.message.edit_text(text=dosug[data['dosug_sphere']][callback.data],
                                              reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.transfer_state)
