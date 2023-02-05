@@ -17,6 +17,14 @@ def get_masters():
     with open('masters.json', encoding='utf-8') as d:
         return json.load(d)
 
+def get_dosug():
+    with open('dosug.json', encoding='utf-8') as d:
+        return json.load(d)
+
+
+def update_dosug(new_dict):
+    with open('dosug.json', 'w', encoding='utf-8') as d:
+        json.dump(new_dict, d, ensure_ascii=False)
 
 def kb_from_dict(d: dict):
     if d.keys():
