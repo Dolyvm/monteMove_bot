@@ -1,5 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+import matplotlib
 import calendar
 import datetime
 import json

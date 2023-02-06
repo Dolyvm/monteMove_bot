@@ -8,10 +8,10 @@ start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
     InlineKeyboardButton(text='Проверенные мастера Черногории', callback_data='masters'),
+    InlineKeyboardButton(text='Досуг', callback_data='dosug'),
     InlineKeyboardButton(text='Быт', callback_data='byt'),
     InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Move'),
 ))
-
 back_button = InlineKeyboardButton(text='Назад', callback_data='back')
 back_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Назад', callback_data='back')]])
 
@@ -67,6 +67,12 @@ residence_docs_kb = InlineKeyboardMarkup(row_width=1).add(*(
 realty_final_kb = ReplyKeyboardMarkup().add(
     KeyboardButton(text='Завершить отправку файлов')
 )
+
+yur_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='Прикрепить документы', callback_data='send_docs'),
+    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    back_button
+))
 
 residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
