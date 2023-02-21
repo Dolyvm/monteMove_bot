@@ -1,24 +1,25 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 start_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Обмен валют', callback_data='exchange'),
     InlineKeyboardButton(text='ВНЖ/Документы', callback_data='residence/docs'),
+    #Сюда правку о несудимости
+    InlineKeyboardButton(text='Обмен валют', callback_data='exchange'),
+    InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Аренда авто', callback_data='auto'),
     InlineKeyboardButton(text='Трансферы/Визаран', callback_data='transfer'),
-    InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Недвижимость', callback_data='realty'),
     InlineKeyboardButton(text='Проверенные мастера Черногории', callback_data='masters'),
     InlineKeyboardButton(text='Досуг', callback_data='dosug'),
     InlineKeyboardButton(text='Быт', callback_data='byt'),
-    InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Move'),
+    InlineKeyboardButton(text='Связь с нами', url='t.me/Monte_Manager'),
 ))
 back_button = InlineKeyboardButton(text='Назад', callback_data='back')
 back_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Назад', callback_data='back')]])
 
 
 auto_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Заказать Аренду Авто', callback_data='rent_auto'),
-    InlineKeyboardButton(text='Сдать своё Авто в аренду', callback_data='give_rent_auto'),
+    InlineKeyboardButton(text='Арендовать авто', callback_data='rent_auto'),
+    InlineKeyboardButton(text='Сдать своё авто в аренду', callback_data='give_rent_auto'),
     back_button
 ))
 
@@ -75,10 +76,10 @@ yur_kb = InlineKeyboardMarkup(row_width=1).add(*(
 ))
 
 residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
+    InlineKeyboardButton(text='ВНЖ на основании открытия юр.лица', callback_data='yur_face'),
+    InlineKeyboardButton(text='ВНЖ на основании трудоустройства', callback_data='employer'),
     InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
-    InlineKeyboardButton(text='ВНЖ на основании открытия фирмы', callback_data='open_company'),
-    InlineKeyboardButton(text='ВНЖ на основе трудоустройства на фирму', callback_data='employer'),
-    InlineKeyboardButton(text='ВНЖ на основании открытии юр.лица', callback_data='yur_face'),
+    #InlineKeyboardButton(text='ВНЖ на основании открытия фирмы', callback_data='open_company'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
