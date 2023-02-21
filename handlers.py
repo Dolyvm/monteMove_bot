@@ -17,7 +17,7 @@ from table_ctrl import update_table
 from utils import start_text, option_text, exchange_text, final_text, exchange_order_text, residence_docs_text, \
     gruz_text, realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_second_text, rent_auto_third_text, number_text, other_text, \
+    rent_auto_first_text, rent_auto_third_text, number_text, other_text, \
     vremennie_trudnosti, oreder_text, exchange_hi_text, criminal_record_text, gruzz_text, yur_face_text
 
 # CHAT_ID = -1001638112743  # Prod
@@ -151,7 +151,7 @@ def register_user_handlers(dp: Dispatcher):
     async def auto_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == 'rent_auto':
             await callback.message.edit_text(text=rent_auto_first_text)
-            await UserStates.rent_auto_text_state.set()
+            await UserStates.final_state.set()
             await state.update_data(option=buttons_name_dict[callback.data])
         elif callback.data == 'give_rent_auto':
             await callback.message.edit_text(text=rent_auto_third_text)
