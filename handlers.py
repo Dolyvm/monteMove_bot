@@ -71,6 +71,10 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(option_text, reply_markup=residence_docs_kb)
             await UserStates.residence_state.set()
             await state.update_data(category='ВНЖ/Документы')
+        elif callback.data == 'criminal_record':
+            await callback.message.edit_text(text=criminal_record_text, reply_markup=exchange_kb)
+            await UserStates.criminal_record_state.set()
+            await state.update_data(category='Справка о несудимости')
         elif callback.data == 'auto':
             await callback.message.edit_text(text='Аренда авто', reply_markup=auto_kb)
             await UserStates.auto_state.set()
@@ -269,9 +273,6 @@ def register_user_handlers(dp: Dispatcher):
         elif callback.data == 'get_residence':
             await callback.message.edit_text(text=option_text, reply_markup=residence_options_kb)
             await UserStates.vnj_state.set()
-        elif callback.data == 'criminal_record':
-            await callback.message.edit_text(text=criminal_record_text, reply_markup=exchange_kb)
-            await UserStates.criminal_record_state.set()
 
         else:
             await callback.message.answer(text=residence_docs_text)
@@ -285,7 +286,7 @@ def register_user_handlers(dp: Dispatcher):
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
         elif callback.data == 'leave_order':
-            await state.update_data(option=buttons_name_dict[callback.data])
+            await state.update_data(option="Справка о несудимости")
             await callback.message.answer(text=oreder_text)
             await UserStates.final_state.set()
 
@@ -467,6 +468,15 @@ def register_user_handlers(dp: Dispatcher):
         data = await state.get_data()
         order = generateOrder()
         await state.update_data(order=order)
+
+        await number.bot.send_message(chat_id=number["from"]["id"],
+                                      text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
+        await number.bot.send_message(
+            chat_id=number["from"]["id"],
+            text=start_text.format(
+                dict(number['from']).get('first_name', '') + ' ' + dict(number['from']).get('last_name', '')),
+            reply_markup=start_kb)
+
         update_table(category=data["category"],
                      option=data["option"],
                      number=number["contact"]["phone_number"],
@@ -488,12 +498,6 @@ def register_user_handlers(dp: Dispatcher):
         with suppress(ValidationError):
             await number.bot.send_media_group(chat_id=CHAT_ID, media=media_documents)
 
-        await number.bot.send_message(chat_id=number["from"]["id"],
-                                      text=final_text.format(order), reply_markup=ReplyKeyboardRemove())
-        await number.bot.send_message(
-            chat_id=number["from"]["id"],
-            text=start_text.format(dict(number['from']).get('first_name', '') + ' ' + dict(number['from']).get('last_name', '')),
-            reply_markup=start_kb)
         await state.update_data(photos=[])
         await state.update_data(documents=[])
         await UserStates.start_state.set()

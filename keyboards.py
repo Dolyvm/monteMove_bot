@@ -1,8 +1,11 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
+to_manager_button = InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником',
+                                         url='t.me/Monte_Manager')
+
 start_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ВНЖ/Документы', callback_data='residence/docs'),
-    #Сюда правку о несудимости
+    InlineKeyboardButton(text='Справка о несудимости', callback_data='criminal_record'),
     InlineKeyboardButton(text='Обмен валют', callback_data='exchange'),
     InlineKeyboardButton(text='Грузоперевозки', callback_data='gruz'),
     InlineKeyboardButton(text='Аренда авто', callback_data='auto'),
@@ -60,7 +63,6 @@ exchange_kb = InlineKeyboardMarkup(row_width=1).add(*(
 
 residence_docs_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Получить ВНЖ', callback_data='get_residence'),
-    InlineKeyboardButton(text='Справка о несудимости', callback_data='criminal_record'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
@@ -69,17 +71,11 @@ realty_final_kb = ReplyKeyboardMarkup().add(
     KeyboardButton(text='Завершить отправку файлов')
 )
 
-yur_kb = InlineKeyboardMarkup(row_width=1).add(*(
-    InlineKeyboardButton(text='Прикрепить документы', callback_data='send_docs'),
-    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
-    back_button
-))
 
 residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ВНЖ на основании открытия юр.лица', callback_data='yur_face'),
     InlineKeyboardButton(text='ВНЖ на основании трудоустройства', callback_data='employer'),
     InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
-    #InlineKeyboardButton(text='ВНЖ на основании открытия фирмы', callback_data='open_company'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button
 ))
@@ -87,13 +83,13 @@ residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
 open_company_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Увидеть список документов', callback_data='show_docs'),
     InlineKeyboardButton(text='Прикрепить документы', callback_data='upload_docs'),
-    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    to_manager_button,
     back_button
 ))
 
 employer_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Оставить заявку', callback_data='leave_order'),
-    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    to_manager_button,
     back_button
 ))
 
@@ -125,6 +121,6 @@ number_request.add(number_button)
 
 yur_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='Прикрепить документы', callback_data='send_docs'),
-    InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником', callback_data='ask_questions'),
+    to_manager_button,
     back_button
 ))

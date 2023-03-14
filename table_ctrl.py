@@ -29,6 +29,8 @@ def update_table(category, option, number, text, order, client_nickname="", ):
     worksheet.update_cell(new_n, 7, number)
     worksheet.update_cell(new_n, 8, text)
     worksheet.update_cell(new_n, 9, order)
+    # worksheet.batch_update()
+    # TODO ускорить эту хуйню 7 раз, обновляя таблицу функцией выше
 
 
 def test():
