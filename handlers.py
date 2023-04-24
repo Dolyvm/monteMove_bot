@@ -18,7 +18,7 @@ from utils import start_text, option_text, final_text, exchange_order_text, resi
     realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
     rent_auto_first_text, rent_auto_third_text, number_text, vremennie_trudnosti, oreder_text, exchange_hi_text, \
-    criminal_record_text, gruzz_text, yur_face_text
+    criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
@@ -110,12 +110,13 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.exchange_state)
     async def exchange_options(callback: CallbackQuery, state: FSMContext):
+        data = await state.get_data()
         if callback.data == "back":
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
             await UserStates.start_state.set()
         elif callback.data == 'leave_order':
-            await state.update_data(option=buttons_name_dict[callback.data])
+            await state.update_data(option=data["category"])
             await callback.message.edit_text(oreder_text)
             await UserStates.final_state.set()
 
@@ -287,8 +288,8 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.start_state.set()
         elif callback.data == 'leave_order':
             await state.update_data(option="Справка о несудимости")
-            await callback.message.answer(text=oreder_text)
-            await UserStates.final_state.set()
+            await UserStates.get_main_number_state.set()
+            await callback.message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
 
     @dp.callback_query_handler(state=UserStates.gruz_state)
     async def gruz_options(callback: CallbackQuery, state: FSMContext):
@@ -310,10 +311,10 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
             await UserStates.vnj_final_state.set()
         elif callback.data == 'realty_ownership':  # на основании владения недвижкой
-            await callback.message.answer(text=vremennie_trudnosti)
+            await callback.message.answer(text=vnj_realty_text)
             await UserStates.final_state.set()
         elif callback.data == 'other':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Move \nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         if callback.data == 'open_company':
             await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
@@ -331,7 +332,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
             await UserStates.get_documents_state.set()
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Move \nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'back':
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
@@ -345,7 +346,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
             await UserStates.get_main_number_state.set()
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Move \nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'back':
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
@@ -360,7 +361,7 @@ def register_user_handlers(dp: Dispatcher):
                 reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
 
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Move\nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Manager\nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'upload_docs':
             await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
