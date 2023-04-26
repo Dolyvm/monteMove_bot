@@ -74,7 +74,7 @@ realty_final_kb = ReplyKeyboardMarkup().add(
 
 residence_options_kb = InlineKeyboardMarkup(row_width=1).add(*(
     InlineKeyboardButton(text='ВНЖ на основании открытия юр.лица', callback_data='yur_face'),
-    InlineKeyboardButton(text='ВНЖ на основании трудоустройства', callback_data='employer'),
+    # InlineKeyboardButton(text='ВНЖ на основании трудоустройства', callback_data='employer'),
     InlineKeyboardButton(text='ВНЖ на основании владения недвижимостью', callback_data='realty_ownership'),
     InlineKeyboardButton(text='Другое', callback_data='other'),
     back_button

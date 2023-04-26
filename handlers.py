@@ -310,8 +310,8 @@ def register_user_handlers(dp: Dispatcher):
         elif callback.data == 'employer':  # Трудоустройство
             await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
             await UserStates.vnj_final_state.set()
-        elif callback.data == 'realty_ownership':  # на основании владения недвижкой
-            await callback.message.answer(text=vnj_realty_text)
+        elif callback.data == 'realty_ownership':  # на основании владения недвижкой+
+            await callback.message.answer(text=vnj_realty_text, parse_mode="HTML")
             await UserStates.final_state.set()
         elif callback.data == 'other':
             await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
