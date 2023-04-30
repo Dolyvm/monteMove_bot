@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 
 from aiogram import Dispatcher
@@ -5,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InputFile
 
-from admin_keyboards import ap_master_start_kb, ap_start_kb, ap_settings_kb
+from admin_keyboards import ap_start_kb, ap_settings_kb
 from functions import kb_from_dict, get_masters, update_masters, get_dosug, update_dosug
 from statistics.stats_functions import create_month_stats
 
@@ -49,6 +51,7 @@ def register_admin_handlers(dp: Dispatcher):
             await callback.message.answer_photo(photo=InputFile('statistics/stats.png'))
             return
         await state.update_data(file=callback.data)  # callback.data == 'master' | 'dosug'
+        print(callback.data)
         await callback.message.answer(text="Выберите подходящую опцию.", reply_markup=ap_settings_kb)
         await AdminPanelStates.AP_SETTINGS_OPTION.set()
 
@@ -90,7 +93,7 @@ def register_admin_handlers(dp: Dispatcher):
         # Если нужно провести какие-либо изменения с вкладками
         if data['option'] == "edit_tab":
             await callback.message.edit_text("Введите новое название вкладки")
-            await AdminPanelStates.GET_NEW_FIELD_STATE.set()
+            await AdminPanelStates.GET_NEW_TAB_NAME_STATE.set()
             return
 
         _dict = get_masters() if data["file"] == "master" else get_dosug()
@@ -99,8 +102,8 @@ def register_admin_handlers(dp: Dispatcher):
             update_masters(_dict) if data["file"] == "master" else update_dosug(_dict)
             await callback.message.answer("Отлично! Вкладка удалена.")
             # Перекидываем в начало
-            await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_settings_kb)
-            await AdminPanelStates.AP_SETTINGS_OPTION.set()
+            await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
+            await AdminPanelStates.AP_START_STATE.set()
             return
 
         if data['option'] == "add_field":
@@ -108,7 +111,7 @@ def register_admin_handlers(dp: Dispatcher):
                                                "Название поля\n"
                                                "Информация (на следующей строке)")
             await state.update_data(current_tab=callback.data)
-            await AdminPanelStates.GET_NEW_FIELD_STATE.set()
+            await AdminPanelStates.GET_NEW_FIELD_NAME_STATE.set()
             return
 
         kb = kb_from_dict(_dict[callback.data])
@@ -124,20 +127,20 @@ def register_admin_handlers(dp: Dispatcher):
     async def ap_choose_field(callback: CallbackQuery, state: FSMContext):
         data = await state.get_data()
         _dict = get_masters() if data["file"] == "master" else get_dosug()
-        if data['option'] == 'edit_master':
+        if data['option'] == 'edit_field':
             await callback.message.answer(text=f"```\n{callback.data}\n"
                                                f"{_dict[data['current_tab']][callback.data]}```\n"
-                                               f"Введите новое название и описание мастера.", parse_mode="Markdown")
+                                               f"Введите новое название и описание поля.", parse_mode="Markdown")
             await state.update_data(field=callback.data)
             await AdminPanelStates.GET_NEW_FIELD_NAME_STATE.set()
-        elif data['option'] == "remove_master":
+        elif data['option'] == "remove_field":
             del _dict[data['current_tab']][callback.data]
             update_masters(_dict) if data["file"] == "master" else update_dosug(_dict)
 
             await callback.message.answer("Поле успешно удалено.")
             # Перекидываем в начало
-            await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_settings_kb)
-            await AdminPanelStates.AP_SETTINGS_OPTION.set()
+            await callback.message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
+            await AdminPanelStates.AP_START_STATE.set()
 
     @dp.message_handler(state=AdminPanelStates.GET_NEW_TAB_NAME_STATE)
     async def get_new_tab(message: Message, state: FSMContext):
@@ -150,7 +153,7 @@ def register_admin_handlers(dp: Dispatcher):
             update_masters(_dict) if data["file"] == "master" else update_dosug(_dict)
             await message.answer("Отлично! Вкладка переименована.")
             # Перекидываем в начало
-            await message.answer(text="Что вы хотите сделать?", reply_markup=ap_master_start_kb)
+            await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
             await AdminPanelStates.AP_START_STATE.set()
             return
 
@@ -175,8 +178,8 @@ def register_admin_handlers(dp: Dispatcher):
 
         data = await state.get_data()
         _dict = get_masters() if data["file"] == "master" else get_dosug()
-        if data.get("option") == "edit_master":
-            del _dict[data["current_tab"]][data['master']]
+        if data.get("option") == "edit_field":
+            del _dict[data["current_tab"]][data['field']]
         _dict[data["current_tab"]][field_name] = field_info
 
         update_masters(_dict) if data["file"] == "master" else update_dosug(_dict)
@@ -184,5 +187,5 @@ def register_admin_handlers(dp: Dispatcher):
             text=f'Отлично! Информация о новом поле успешно добавлена во вкладку «{data["current_tab"]}»')
 
         # Перекидываем в начало
-        await message.answer(text="Что вы хотите сделать?", reply_markup=ap_master_start_kb)
+        await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
         await AdminPanelStates.AP_START_STATE.set()

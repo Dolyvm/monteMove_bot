@@ -9,8 +9,8 @@ from admin_panel import register_admin_handlers
 from handlers import register_user_handlers
 from statistics.stats_functions import scheduler
 
-# bot = Bot('5626261222:AAHKJo2DzuU5vpMJuBQspVbPJmOge6nJaJs')  # prod
-bot = Bot("5012407051:AAFi9pOFidtHbJeeGakeBMso8UwA0HESIwU")  # test
+bot = Bot('5626261222:AAHKJo2DzuU5vpMJuBQspVbPJmOge6nJaJs')  # prod
+# bot = Bot("5012407051:AAFi9pOFidtHbJeeGakeBMso8UwA0HESIwU")  # test
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 

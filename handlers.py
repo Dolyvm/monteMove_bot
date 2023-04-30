@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from contextlib import suppress
 
 from aiogram import Dispatcher

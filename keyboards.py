@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 to_manager_button = InlineKeyboardButton(text='У меня остались вопросы, хочу поговорить с сотрудником',
