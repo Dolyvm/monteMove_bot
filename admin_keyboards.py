@@ -1,13 +1,9 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-
-# start_admin_kb = InlineKeyboardMarkup(row_width=1).add(*[
-#     InlineKeyboardButton('Добавить новую вкладку', callback_data="add_new_tab"),
-#     InlineKeyboardButton('Изменить существующее', callback_data="edit_existing"),
-# ])
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 ap_start_kb = InlineKeyboardMarkup(row_width=1).add(*[
-    InlineKeyboardButton("Настройка мастеров", callback_data="master"),
+    InlineKeyboardButton("Настройка мастеров", callback_data="masters"),
     InlineKeyboardButton("Настройка досуга", callback_data="dosug"),
+    InlineKeyboardButton("Настройка мест", callback_data="places"),
     InlineKeyboardButton("Посмотреть статистику за месяц", callback_data="check_stats")
 ])
 

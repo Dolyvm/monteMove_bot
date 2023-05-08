@@ -13,18 +13,15 @@ def generate_order():
     return random.randint(100000, 999999)
 
 
-def get_masters():
-    with open('masters.json', encoding='utf-8') as d:
-        return json.load(d)
-
-def get_dosug():
-    with open('dosug.json', encoding='utf-8') as d:
+def get_file(filename: str) -> dict:
+    with open(f'files/{filename}.json', encoding='utf-8') as d:
         return json.load(d)
 
 
-def update_dosug(new_dict):
-    with open('dosug.json', 'w', encoding='utf-8') as d:
+def update_file(filename: str, new_dict: dict):
+    with open(f'files/{filename}.json', 'w', encoding='utf-8') as d:
         json.dump(new_dict, d, ensure_ascii=False)
+
 
 def kb_from_dict(d: dict):
     if d.keys():
@@ -32,8 +29,3 @@ def kb_from_dict(d: dict):
                                                        for i in d.keys()])
     else:
         return
-
-
-def update_masters(new_dict):
-    with open('masters.json', 'w', encoding='utf-8') as d:
-        json.dump(new_dict, d, ensure_ascii=False)

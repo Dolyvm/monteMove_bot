@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import asyncio
 from contextlib import suppress
 
 from aiogram import Dispatcher
@@ -9,18 +9,18 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, MediaGro
     InlineKeyboardButton, Contact
 from aiogram.utils.exceptions import ValidationError
 
-from functions import get_masters, kb_from_dict, get_dosug
+from functions import kb_from_dict, get_file
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, url_kb, auto_kb, number_request, \
-    back_kb, yur_kb
+    back_kb
 from statistics.stats_functions import append_visitor
 from table_ctrl import generateOrder
 from table_ctrl import update_table
 from utils import start_text, option_text, final_text, exchange_order_text, residence_docs_text, \
     realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
-    rent_auto_first_text, rent_auto_third_text, number_text, vremennie_trudnosti, oreder_text, exchange_hi_text, \
-    criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text
+    rent_auto_first_text, rent_auto_third_text, number_text, oreder_text, exchange_hi_text, \
+    criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text, yur_face_pdf_id, if_empty_place
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
@@ -53,6 +53,8 @@ class UserStates(StatesGroup):
     employer_state = State()
     dosug_state = State()
     show_dosug_state = State()
+    places_state = State()
+    show_place_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -94,7 +96,7 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.realty_state.set()
             await state.update_data(category='Недвижимость')
         elif callback.data == 'masters':
-            kb = kb_from_dict(get_masters()).add(back_button)
+            kb = kb_from_dict(get_file("masters")).add(back_button)
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.master_state.set()
             await state.update_data(category='Мастера')
@@ -103,9 +105,13 @@ def register_user_handlers(dp: Dispatcher):
             await UserStates.master_state.set()
             await state.update_data(category='Быт')
         elif callback.data == 'dosug':
-            kb = kb_from_dict(get_dosug()).add(back_button)
+            kb = kb_from_dict(get_file("dosug")).add(back_button)
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.dosug_state.set()
+        elif callback.data == 'places':
+            kb = kb_from_dict(get_file("places")).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.places_state.set()
         elif callback.data == 'back':
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
@@ -124,7 +130,7 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.dosug_state)
     async def dosug_options(callback: CallbackQuery, state: FSMContext):
-        dosug = get_dosug()
+        dosug = get_file("dosug")
         if callback.data == "back":
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
@@ -144,7 +150,8 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.show_dosug_state)
     async def show_dosug(callback: CallbackQuery, state: FSMContext):
-        dosug = get_dosug()
+        dosug = get_file("dosug")
+
         data = await state.get_data()
         if callback.data == "back":
             kb = kb_from_dict(dosug).add(back_button)
@@ -153,6 +160,39 @@ def register_user_handlers(dp: Dispatcher):
             # await state.update_data(category='Мастера')
         else:
             await callback.message.edit_text(text=dosug[data['dosug_sphere']][callback.data],
+                                             reply_markup=back_kb)
+
+    @dp.callback_query_handler(state=UserStates.places_state)
+    async def places_options(callback: CallbackQuery, state: FSMContext):
+        places = get_file("places")
+        if callback.data == "back":
+            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                             reply_markup=start_kb)
+            await UserStates.start_state.set()
+            return
+        else:
+            kb = kb_from_dict(places[callback.data])
+            if kb:
+                kb.add(back_button)
+                await callback.message.edit_text(text='Список доступных вариантов:',
+                                                 reply_markup=kb)
+                await state.update_data(places_sphere=callback.data)
+            else:
+                await callback.message.edit_text(text=if_empty_place,
+                                                 reply_markup=back_kb)
+        await UserStates.show_place_state.set()
+
+    @dp.callback_query_handler(state=UserStates.show_place_state)
+    async def show_place(callback: CallbackQuery, state: FSMContext):
+        places = get_file("places")
+
+        data = await state.get_data()
+        if callback.data == "back":
+            kb = kb_from_dict(places).add(back_button)
+            await callback.message.edit_text(option_text, reply_markup=kb)
+            await UserStates.places_state.set()
+        else:
+            await callback.message.edit_text(text=places[data['place_sphere']][callback.data],
                                              reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.auto_state)
@@ -191,7 +231,7 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.master_state)
     async def masters_options(callback: CallbackQuery, state: FSMContext):
-        masters = get_masters()
+        masters = get_file("masters")
         if callback.data == "back":
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
                                              reply_markup=start_kb)
@@ -211,10 +251,11 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.show_master_state)
     async def show_master(callback: CallbackQuery, state: FSMContext):
-        masters = get_masters()
+        masters = get_file("masters")
+
         data = await state.get_data()
         if callback.data == "back":
-            kb = kb_from_dict(get_masters()).add(back_button)
+            kb = kb_from_dict(get_file("masters")).add(back_button)
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.master_state.set()
             await state.update_data(category='Мастера')
@@ -307,7 +348,11 @@ def register_user_handlers(dp: Dispatcher):
     @dp.callback_query_handler(state=UserStates.vnj_state)
     async def vnj_options(callback: CallbackQuery, state: FSMContext):
         if callback.data == "yur_face":  # Юр лицо
-            await callback.message.edit_text(text=yur_face_text, reply_markup=employer_kb)
+            msg_ids = (
+                (await callback.message.edit_text(text=yur_face_text)).message_id,
+                (await callback.message.answer_document(document=yur_face_pdf_id, reply_markup=employer_kb)).message_id
+            )
+            await state.update_data(yur_face_msg_ids=msg_ids)
             await UserStates.vnj_final_state.set()
         elif callback.data == 'employer':  # Трудоустройство
             await callback.message.edit_text(text=employer_text, reply_markup=employer_kb)
@@ -316,7 +361,8 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.answer(text=vnj_realty_text, parse_mode="HTML")
             await UserStates.final_state.set()
         elif callback.data == 'other':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
+            await callback.message.answer(
+                text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         if callback.data == 'open_company':
             await callback.message.edit_text(text=vnj_text, reply_markup=open_company_kb)
@@ -334,7 +380,8 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
             await UserStates.get_documents_state.set()
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
+            await callback.message.answer(
+                text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'back':
             await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
@@ -343,16 +390,26 @@ def register_user_handlers(dp: Dispatcher):
 
     @dp.callback_query_handler(state=UserStates.vnj_final_state)
     async def vnj_final(callback: CallbackQuery, state: FSMContext):
+        data = await state.get_data()
         if callback.data == 'leave_order':
-            data = await state.get_data()
             await callback.message.answer(text=number_text, reply_markup=number_request, parse_mode='Markdown')
             await UserStates.get_main_number_state.set()
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
+            await callback.message.answer(
+                text='Контакты менеджера: @Monte_Manager \nДля перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'back':
-            await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
-                                             reply_markup=start_kb)
+            if data.get("yur_face_msg_ids"):
+                await callback.message.bot.delete_message(chat_id=callback.from_user.id,
+                                                          message_id=data["yur_face_msg_ids"][1])
+                await callback.message.bot.delete_message(chat_id=callback.from_user.id,
+                                                          message_id=data["yur_face_msg_ids"][0])
+                await state.update_data(yur_face_msg_ids=None)
+                await callback.message.answer(text=start_text.format(callback.message.chat.full_name),
+                                              reply_markup=start_kb)
+            else:
+                await callback.message.edit_text(text=start_text.format(callback.message.chat.full_name),
+                                                 reply_markup=start_kb)
             await UserStates.start_state.set()
 
     @dp.callback_query_handler(state=UserStates.vnj_middle_state)
@@ -363,7 +420,8 @@ def register_user_handlers(dp: Dispatcher):
                 reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(text='Назад', callback_data='back2')))
 
         elif callback.data == 'ask_questions':
-            await callback.message.answer(text='Контакты менеджера: @Monte_Manager\nДля перехода в начало введите /start')
+            await callback.message.answer(text='Контакты менеджера: @Monte_Manager\n'
+                                               'Для перехода в начало введите /start')
             await UserStates.start_state.set()
         elif callback.data == 'upload_docs':
             await callback.message.answer(text=vnj_docs_text, reply_markup=realty_final_kb)
