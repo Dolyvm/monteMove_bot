@@ -8,8 +8,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InputFile
 
 from admin_keyboards import ap_start_kb, ap_settings_kb
-from functions import kb_from_dict, get_file, update_file
+from functions import kb_from_dict, get_file, update_file, compress_text
 from statistics.stats_functions import create_month_stats
+from utils import FORWARD_CHAT_ID
 
 admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155]
 
@@ -36,11 +37,25 @@ class AdminPanelStates(StatesGroup):
     CHOOSE_TAB_STATE = State()
     CHOOSE_MASTER_STATE = State()
 
+    FORWARD_STATE = State()
+
 
 def register_admin_handlers(dp: Dispatcher):
     # @dp.message_handler(lambda message: message.chat.id in admins, commands=['open_panel'], state='*')
     @dp.message_handler(commands=['open_panel'], state='*', chat_id=admins)
     async def open_panel(message: Message):
+        await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
+        await AdminPanelStates.AP_START_STATE.set()
+
+    @dp.message_handler(commands=['forward'], state='*', chat_id=admins)
+    async def pre_forward(message: Message):
+        await message.answer("Отправьте сообщение, которое должно быть перенаправлено в группу.")
+        await AdminPanelStates.FORWARD_STATE.set()
+
+    @dp.message_handler(state=AdminPanelStates.FORWARD_STATE, chat_id=admins)
+    async def send_forward(message: Message):
+        await message.copy_to(FORWARD_CHAT_ID, message.text)
+        await message.answer("Отлично! Сообщение отправлено в чат.")
         await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
         await AdminPanelStates.AP_START_STATE.set()
 
@@ -145,12 +160,18 @@ def register_admin_handlers(dp: Dispatcher):
 
     @dp.message_handler(state=AdminPanelStates.GET_NEW_TAB_NAME_STATE)
     async def get_new_tab(message: Message, state: FSMContext):
+        # Прежде всего проверяем валидность введенных данных
+        text = compress_text(message.text)
+        if len(text.encode('utf-8')) > 64:
+            await message.answer("Текст слишком большой. Пожалуйста, попробуйте еще раз.")
+            return
+
         data = await state.get_data()
         _dict = get_file(data['file'])
 
         # Если нужно изменить название вкладки:
         if data.get('option') == "edit_tab":
-            _dict[message.text] = _dict[data['current_tab']]
+            _dict[text] = _dict[data['current_tab']]
             del _dict[data['current_tab']]
             update_file(data['file'], _dict)
 
@@ -161,14 +182,14 @@ def register_admin_handlers(dp: Dispatcher):
             return
 
         # Сохраняем
-        _dict[message.text] = {}
+        _dict[text] = {}
         update_file(data['file'], _dict)
 
         await message.answer(text="Отлично! Новая вкладка успешно создана.")
         await message.answer(text="Введите название поля и информацию о нем в следующем виде:\n"
                                   "Название поля\n"
                                   "Информация (на следующей строке)")
-        await state.update_data(current_tab=message.text)
+        await state.update_data(current_tab=text)
         await AdminPanelStates.GET_NEW_FIELD_NAME_STATE.set()
 
     @dp.message_handler(state=AdminPanelStates.GET_NEW_FIELD_NAME_STATE)
@@ -177,6 +198,12 @@ def register_admin_handlers(dp: Dispatcher):
             field_name, field_info = message.text.split('\n', maxsplit=1)
         except ValueError:
             await message.answer(text="Сообщение написано неверно. Пожалуйста, попробуйте еще раз")
+            return
+
+        # Прежде всего проверяем валидность введенных данных
+        field_name = compress_text(field_name)
+        if len(field_name.encode('utf-8')) > 64:
+            await message.answer("Текст слишком большой. Пожалуйста, попробуйте еще раз.")
             return
 
         data = await state.get_data()
