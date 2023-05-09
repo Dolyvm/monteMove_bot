@@ -29,3 +29,32 @@ def kb_from_dict(d: dict):
                                                        for i in d.keys()])
     else:
         return
+
+
+translit_dict = {
+        "у":"y",
+        "К":"K",
+        "Е":"E",
+        "е":"e",
+        "Н":"H",
+        "х":"x",
+        "Х":"X",
+        "В":"B",
+        "а":"a",
+        "А":"A",
+        "р":"p",
+        "Р":"P",
+        "о":"o",
+        "О":"O",
+        "с":"c",
+        "С":"C",
+        "М":"M",
+        "Т":"T"
+    }
+
+
+def compress_text(text: str) -> str:
+    result = ""
+    for c in text:
+        result += translit_dict.get(c, c)
+    return result
