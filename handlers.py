@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import asyncio
 from contextlib import suppress
 
 from aiogram import Dispatcher
@@ -13,7 +12,6 @@ from functions import kb_from_dict, get_file
 from keyboards import start_kb, exchange_kb, residence_docs_kb, back_button, gruz_kb, realty_kb, trans_vis_kb, \
     realty_final_kb, residence_options_kb, open_company_kb, employer_kb, url_kb, auto_kb, number_request, \
     back_kb
-from main import forward_chat_id
 from statistics.stats_functions import append_visitor
 from table_ctrl import generateOrder
 from table_ctrl import update_table
@@ -21,8 +19,7 @@ from utils import start_text, option_text, final_text, exchange_order_text, resi
     realty_text_1, realty_text_2, trans_vis_text_1, trans_vis_text_2, trans_vis_text_3, realty_text_3, \
     realty_text_4, buttons_name_dict, vnj_text, employer_text, vnj_docs_text, zaglushka_text, byt_text, \
     rent_auto_first_text, rent_auto_third_text, number_text, oreder_text, exchange_hi_text, \
-    criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text, yur_face_pdf_id, if_empty_place, forward_text, \
-    forward_done
+    criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text, yur_face_pdf_id, if_empty_place
 
 # CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
@@ -57,25 +54,11 @@ class UserStates(StatesGroup):
     show_dosug_state = State()
     places_state = State()
     show_place_state = State()
-    forward_state = State()
 
 
 def register_user_handlers(dp: Dispatcher):
     @dp.message_handler(commands=['start', 'help'], state='*')
     async def start(message: Message, state: FSMContext):
-        await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
-        await state.update_data(text=list())
-        await UserStates.start_state.set()
-        append_visitor(message.from_user.id)
-
-    @dp.message_handler(commands=['forward'], state='*')
-    async def pre_forward(message: Message, state: FSMContext):
-        await message.answer(forward_text)
-        await UserStates.forward_state.set()
-
-    @dp.message_handler(state=UserStates.forward_state)
-    async def forward(message: Message, state: FSMContext):
-        await message.copy_to(forward_chat_id, message.text)
         await message.answer(start_text.format(message.chat.full_name), reply_markup=start_kb)
         await state.update_data(text=list())
         await UserStates.start_state.set()
@@ -208,7 +191,7 @@ def register_user_handlers(dp: Dispatcher):
             await callback.message.edit_text(option_text, reply_markup=kb)
             await UserStates.places_state.set()
         else:
-            await callback.message.edit_text(text=places[data['place_sphere']][callback.data],
+            await callback.message.edit_text(text=places[data['places_sphere']][callback.data],
                                              reply_markup=back_kb)
 
     @dp.callback_query_handler(state=UserStates.auto_state)
