@@ -13,6 +13,7 @@ from statistics.stats_functions import scheduler
 
 # bot = Bot('5626261222:AAHKJo2DzuU5vpMJuBQspVbPJmOge6nJaJs')  # prod
 bot = Bot("5012407051:AAFi9pOFidtHbJeeGakeBMso8UwA0HESIwU")  # test
+forward_chat_id = -1001763589351
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
