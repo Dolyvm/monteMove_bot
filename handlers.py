@@ -21,7 +21,6 @@ from utils import start_text, option_text, final_text, exchange_order_text, resi
     rent_auto_first_text, rent_auto_third_text, number_text, oreder_text, exchange_hi_text, \
     criminal_record_text, gruzz_text, yur_face_text, vnj_realty_text, yur_face_pdf_id, if_empty_place
 
-# CHAT_ID = -1001638112743  # Prod
 CHAT_ID = -1001591695557  # Test
 
 
